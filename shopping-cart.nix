@@ -11,6 +11,7 @@ mkDerivation {
     aeson async base bytestring containers dhall refined text wreq
   ];
   executableHaskellDepends = [ base ];
+  jailbreak = true;
   description = "The Shopping Cart developed in PFP Scala for Haskell";
   license = stdenv.lib.licenses.asl20;
 }
