@@ -9,6 +9,7 @@ pkgs.stdenv.mkDerivation {
   name = "shell";
   buildInputs = project.env.nativeBuildInputs ++ [
     haskellPackages.cabal-install
+    haskellPackages.hlint
   ];
   shellHook = ''
     export NIX_GHC="$(which ghc)"
