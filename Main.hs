@@ -19,8 +19,8 @@ program = do
     putStrLn "Acquiring PSQL connection"
     conn   <- connect sqlInfo
     brands <- mkLiveBrands conn
-    --create brands (BrandName "Ibanez")
-    bs     <- findAll brands
+    --createBrands brands (BrandName "Ibanez")
+    bs     <- findAllBrands brands
     print bs
 
 main :: IO ()
