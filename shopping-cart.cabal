@@ -21,6 +21,7 @@ library
                      , bytestring
                      , containers
                      , dhall
+                     , exceptions
                      , refined
                      , text
                      , wreq
