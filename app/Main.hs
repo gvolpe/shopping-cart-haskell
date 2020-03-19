@@ -4,8 +4,10 @@ module Main where
 
 import           Database.PostgreSQL.Simple
 import           Domain.Brand
+import           Http.Server
 import qualified Services.Brands               as SB
 import qualified Services.Items                as SI
+import           Services
 
 sqlInfo :: ConnectInfo
 sqlInfo = ConnectInfo { connectHost     = "localhost"
@@ -21,11 +23,12 @@ program = do
   conn   <- connect sqlInfo
   brands <- SB.mkLiveBrands conn
   items  <- SI.mkLiveItems conn
+  runServer (Services brands items)
   --createBrands brands (BrandName "Ibanez")
-  bs     <- SB.findAll brands
-  print bs
-  is <- SI.findAll items
-  print is
+  --bs     <- SB.findAll brands
+  --print bs
+  --is <- SI.findAll items
+  --print is
 
 main :: IO ()
 main = program

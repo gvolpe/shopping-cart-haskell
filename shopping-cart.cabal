@@ -16,6 +16,9 @@ extra-source-files:  CHANGELOG.md
 library
   exposed-modules:     Domain.Brand
                      , Domain.Item
+                     , Http.Handler
+                     , Http.Server
+                     , Services
                      , Services.Brands
                      , Services.Items
   build-depends:       base
@@ -25,11 +28,15 @@ library
                      , containers
                      , dhall
                      , exceptions
-                     , numhask
                      , postgresql-simple
                      , refined
+                     , servant
+                     , servant-server
                      , text
                      , uuid
+                     , wai
+                     , wai-cors
+                     , warp
                      , wreq
   hs-source-dirs:      src
   default-language:    Haskell2010
