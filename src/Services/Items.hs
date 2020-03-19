@@ -6,9 +6,7 @@ module Services.Items where
 
 import           Data.Functor                   ( void )
 import           Data.Text                      ( Text )
-import           Data.UUID                      ( UUID
-                                                , toText
-                                                )
+import           Data.UUID                      ( UUID )
 import           Data.UUID.V4                   ( nextRandom )
 import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.FromField

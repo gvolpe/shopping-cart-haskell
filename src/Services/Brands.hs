@@ -8,9 +8,7 @@ module Services.Brands
 where
 
 import           Data.Functor                   ( void )
-import           Data.UUID                      ( UUID
-                                                , toText
-                                                )
+import           Data.UUID                      ( UUID )
 import           Data.UUID.V4                   ( nextRandom )
 import           Data.Text
 import           Database.PostgreSQL.Simple
