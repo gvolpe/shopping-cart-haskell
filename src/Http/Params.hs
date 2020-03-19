@@ -19,7 +19,7 @@ capitalize "" = ""
 capitalize cs = toUpper (T.head cs) .+ T.map toLower (T.tail cs)
 
 normalize :: Text -> Text
-normalize = capitalize . (T.filter (/= '"'))
+normalize = capitalize . T.filter (/= '"')
 
 toBrandName :: BrandNameParam -> BrandName
 toBrandName p = BrandName $ normalize (unBrandNameParam p)

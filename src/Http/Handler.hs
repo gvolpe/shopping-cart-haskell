@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Http.Handler where
 
 import           Control.Monad.IO.Class         ( liftIO )

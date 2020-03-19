@@ -26,8 +26,14 @@ type ItemsAPI =
 
 type API = BrandsAPI :<|> ItemsAPI
 
+brandsServer :: Services IO -> Server BrandsAPI
+brandsServer s = Handler.findBrands (brands s)
+
+itemsServer :: Services IO -> Server ItemsAPI
+itemsServer = Handler.findItems . items
+
 server :: Services IO -> Server API
-server s = Handler.findBrands (brands s) :<|> Handler.findItems (items s)
+server s = brandsServer s :<|> itemsServer s
 
 api :: Services IO -> Application
 api s = serve (Proxy :: Proxy API) (server s)

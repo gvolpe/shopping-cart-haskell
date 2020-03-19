@@ -32,4 +32,4 @@ data Brand = Brand
 
 instance ToJSON Brand where
   toJSON b = object
-    ["uuid" .= (unBrandId $ brandId b), "name" .= (unBrandName $brandName b)]
+    ["uuid" .= unBrandId (brandId b), "name" .= unBrandName (brandName b)]

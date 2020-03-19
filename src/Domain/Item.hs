@@ -54,8 +54,8 @@ type UpdateItem = Item
 
 instance ToJSON Item where
   toJSON i = object
-    [ "uuid" .= (unItemId $ itemId i)
-    , "name" .= (unItemName $ itemName i)
-    , "description" .= (unItemDescription $ itemDescription i)
+    [ "uuid" .= unItemId (itemId i)
+    , "name" .= unItemName (itemName i)
+    , "description" .= unItemDescription (itemDescription i)
     , "brand" .= toJSON (itemBrand i)
     , "category" .= toJSON (itemCategory i)]

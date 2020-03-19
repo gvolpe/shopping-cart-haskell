@@ -32,6 +32,6 @@ data Category = Category
 
 instance ToJSON Category where
   toJSON b = object
-    [ "uuid" .= (unCategoryId $ categoryId b)
-    , "name" .= (unCategoryName $ categoryName b)
+    [ "uuid" .= unCategoryId (categoryId b)
+    , "name" .= unCategoryName (categoryName b)
     ]
