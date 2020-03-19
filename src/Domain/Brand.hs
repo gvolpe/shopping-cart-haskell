@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
 
 module Domain.Brand
-    ( BrandId(..)
-    , BrandName(..)
-    , Brand(..)
-    )
+  ( BrandId(..)
+  , BrandName(..)
+  , Brand(..)
+  )
 where
 
 import           Database.PostgreSQL.Simple.FromRow

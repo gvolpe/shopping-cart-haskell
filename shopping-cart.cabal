@@ -14,8 +14,8 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
 library
-  exposed-modules:     Algebras.Brands
-                     , Domain.Brand
+  exposed-modules:     Domain.Brand
+                     , Services.Brands
   build-depends:       base
                      , aeson
                      , async

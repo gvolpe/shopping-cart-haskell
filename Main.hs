@@ -2,9 +2,9 @@
 
 module Main where
 
-import           Algebras.Brands
 import           Database.PostgreSQL.Simple
 import           Domain.Brand
+import           Services.Brands
 
 sqlInfo :: ConnectInfo
 sqlInfo = ConnectInfo { connectHost     = "localhost"
@@ -16,12 +16,12 @@ sqlInfo = ConnectInfo { connectHost     = "localhost"
 
 program :: IO ()
 program = do
-    putStrLn "Acquiring PSQL connection"
-    conn   <- connect sqlInfo
-    brands <- mkLiveBrands conn
-    --createBrands brands (BrandName "Ibanez")
-    bs     <- findAllBrands brands
-    print bs
+  putStrLn "Acquiring PSQL connection"
+  conn   <- connect sqlInfo
+  brands <- mkLiveBrands conn
+  --createBrands brands (BrandName "Ibanez")
+  bs     <- findAllBrands brands
+  print bs
 
 main :: IO ()
 main = program

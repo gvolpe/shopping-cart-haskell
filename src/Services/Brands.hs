@@ -2,19 +2,16 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Algebras.Brands
-    ( Brands(..)
-    , mkLiveBrands
-    )
+module Services.Brands
+  ( Brands(..)
+  , mkLiveBrands
+  )
 where
 
 import           Control.Monad.Catch
 import           Data.Functor                   ( void )
 import           Database.PostgreSQL.Simple
-import           Database.PostgreSQL.Simple.FromRow
-import           Database.PostgreSQL.Simple.ToRow
 import           Data.UUID                      ( UUID
-                                                , fromText
                                                 , toText
                                                 )
 import           Data.UUID.V4                   ( nextRandom )
@@ -29,9 +26,9 @@ data Brands m = Brands
 
 mkLiveBrands :: Connection -> IO (Brands IO)
 mkLiveBrands c = pure $ Brands
-    { findAllBrands = (fmap . fmap) toDomain (findAll' c)
-    , createBrand   = create' c
-    }
+  { findAllBrands = (fmap . fmap) toDomain (findAll' c)
+  , createBrand   = create' c
+  }
 
 data BrandDTO = BrandDTO
   { _brandId :: UUID
@@ -40,14 +37,14 @@ data BrandDTO = BrandDTO
 
 toDomain :: BrandDTO -> Brand
 toDomain dto =
-    Brand (BrandId . toText $ _brandId dto) (BrandName $ _brandName dto)
+  Brand (BrandId . toText $ _brandId dto) (BrandName $ _brandName dto)
 
 findAll' :: Connection -> IO [BrandDTO]
 findAll' = flip query_ "SELECT * FROM brands"
 
 create' :: Connection -> BrandName -> IO ()
 create' c b = do
-    uuid <- nextRandom
-    void $ executeMany c
-                       "INSERT INTO brands (uuid, name) VALUES (?, ?)"
-                       [(uuid, unBrandName b)]
+  uuid <- nextRandom
+  void $ executeMany c
+                     "INSERT INTO brands (uuid, name) VALUES (?, ?)"
+                     [(uuid, unBrandName b)]
