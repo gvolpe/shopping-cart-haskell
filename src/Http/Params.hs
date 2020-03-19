@@ -22,7 +22,7 @@ normalize :: Text -> Text
 normalize = capitalize . T.filter (/= '"')
 
 toBrandName :: BrandNameParam -> BrandName
-toBrandName p = BrandName $ normalize (unBrandNameParam p)
+toBrandName = BrandName . normalize . unBrandNameParam
 
 -- TODO: Use refined
 newtype BrandNameParam = BrandNameParam
