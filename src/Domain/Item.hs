@@ -35,7 +35,7 @@ newtype ItemDescription = ItemDescription {
 } deriving (Generic, ToRow, Show)
 
 newtype Money = Money {
- unMoney :: Ratio Integer
+ unMoney :: Double
 } deriving (Generic, Show)
 
 -- TODO: This should be defined in Domain.Category

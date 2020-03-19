@@ -4,7 +4,6 @@
 module Services.Items where
 
 import           Data.Functor                   ( void )
---import           Data.Ratio                     ( Ratio )
 import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID
                                                 , toText
@@ -15,8 +14,7 @@ import           Database.PostgreSQL.Simple.FromField
 import           Domain.Brand
 import           Domain.Item
 import           GHC.Generics                   ( Generic )
---import NumHask.Data.Rational (fromRatio)
-import           GHC.Real                       ( Ratio )
+import           GHC.Real                       ( Rational )
 
 data Items m = Items
   { findAll :: m [Item]
@@ -38,7 +36,7 @@ data ItemDTO = ItemDTO
   { _itemId :: UUID
   , _itemName :: Text
   , _itemDescription :: Text
-  , _itemPrice :: Ratio Integer
+  , _itemPrice :: Rational
   , _brandId :: UUID
   , _categoryId :: UUID
   } deriving (Generic, FromRow, Show)
@@ -48,7 +46,7 @@ toDomain dto = Item
   { itemId          = ItemId $ _itemId dto
   , itemName        = ItemName $ _itemName dto
   , itemDescription = ItemDescription $ _itemDescription dto
-  , itemPrice       = Money $ _itemPrice dto
+  , itemPrice       = Money . fromRational $ _itemPrice dto
   , itemBrand       = Brand (BrandId . toText $ _brandId dto) (BrandName "foo")
   , itemCategory    = Category (toText $ _categoryId dto)
   }
