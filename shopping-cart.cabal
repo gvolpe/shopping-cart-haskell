@@ -15,8 +15,10 @@ extra-source-files:  CHANGELOG.md
 
 library
   exposed-modules:     Domain.Brand
+                     , Domain.Category
                      , Domain.Item
                      , Http.Handler
+                     , Http.Params
                      , Http.Server
                      , Services
                      , Services.Brands
@@ -29,6 +31,7 @@ library
                      , dhall
                      , exceptions
                      , postgresql-simple
+                     , raw-strings-qq
                      , refined
                      , servant
                      , servant-server

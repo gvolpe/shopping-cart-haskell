@@ -6,7 +6,9 @@ import           Data.Aeson
 import           Data.Proxy
 import           Data.Text
 import           Domain.Brand
+import           Domain.Item
 import qualified Http.Handler                   as Handler
+import           Http.Params
 import           Servant
 import           Servant.API
 import           Network.Wai                    ( Application )
@@ -16,12 +18,16 @@ import           Services
 
 type ApiVersion = "v1"
 
-type API =
+type BrandsAPI =
        ApiVersion :> "brands" :> Get '[JSON] [Brand]
-  :<|> ApiVersion :> "items" :> Get '[JSON] String
+
+type ItemsAPI =
+       ApiVersion :> "items" :> QueryParam "brand" BrandNameParam :> Get '[JSON] [Item]
+
+type API = BrandsAPI :<|> ItemsAPI
 
 server :: Services IO -> Server API
-server s = Handler.findAllBrands (brands s) :<|> Handler.findAllItems (items s)
+server s = Handler.findBrands (brands s) :<|> Handler.findItems (items s)
 
 api :: Services IO -> Application
 api s = serve (Proxy :: Proxy API) (server s)

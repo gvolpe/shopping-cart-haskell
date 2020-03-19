@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Domain.Item
   ( ItemId(..)
@@ -7,18 +8,19 @@ module Domain.Item
   , Item(..)
   , CreateItem(..)
   , UpdateItem(..)
-  , Category(..)
   , Money(..)
   )
 where
 
+import           Data.Aeson
+import           Data.UUID                      ( UUID )
+import           Data.Text                      ( Text )
 import           Database.PostgreSQL.Simple.FromRow
                                                 ( FromRow )
 import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
-import           Data.UUID                      ( UUID )
-import           Data.Text                      ( Text )
-import           Domain.Brand                   ( Brand )
+import           Domain.Brand
+import           Domain.Category
 import           GHC.Generics                   ( Generic )
 import           GHC.Real                       ( Ratio )
 
@@ -38,11 +40,6 @@ newtype Money = Money {
  unMoney :: Double
 } deriving (Generic, Show)
 
--- TODO: This should be defined in Domain.Category
-newtype Category = Category {
- unCategory :: Text
-} deriving (Generic, ToRow, Show)
-
 data Item = Item
   { itemId :: ItemId
   , itemName :: ItemName
@@ -54,3 +51,11 @@ data Item = Item
 
 type CreateItem = Item
 type UpdateItem = Item
+
+instance ToJSON Item where
+  toJSON i = object
+    [ "uuid" .= (unItemId $ itemId i)
+    , "name" .= (unItemName $ itemName i)
+    , "description" .= (unItemDescription $ itemDescription i)
+    , "brand" .= toJSON (itemBrand i)
+    , "category" .= toJSON (itemCategory i)]

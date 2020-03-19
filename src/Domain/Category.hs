@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Domain.Brand
-  ( BrandId(..)
-  , BrandName(..)
-  , Brand(..)
+module Domain.Category
+  ( CategoryId(..)
+  , CategoryName(..)
+  , Category(..)
   )
 where
 
@@ -17,19 +17,21 @@ import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
 import           GHC.Generics                   ( Generic )
 
-newtype BrandId = BrandId {
-  unBrandId :: UUID
+newtype CategoryId = CategoryId {
+  unCategoryId :: UUID
 } deriving (Generic, ToRow, Show)
 
-newtype BrandName = BrandName {
-  unBrandName :: Text
+newtype CategoryName = CategoryName {
+  unCategoryName :: Text
 } deriving (Generic, ToRow, Show)
 
-data Brand = Brand
-  { brandId :: BrandId
-  , brandName :: BrandName
+data Category = Category
+  { categoryId :: CategoryId
+  , categoryName :: CategoryName
   } deriving (Generic, Show)
 
-instance ToJSON Brand where
+instance ToJSON Category where
   toJSON b = object
-    ["uuid" .= (unBrandId $ brandId b), "name" .= (unBrandName $brandName b)]
+    [ "uuid" .= (unCategoryId $ categoryId b)
+    , "name" .= (unCategoryName $ categoryName b)
+    ]

@@ -34,7 +34,7 @@ data BrandDTO = BrandDTO
 
 toDomain :: BrandDTO -> Brand
 toDomain dto =
-  Brand (BrandId . toText $ _brandId dto) (BrandName $ _brandName dto)
+  Brand (BrandId $ _brandId dto) (BrandName $ _brandName dto)
 
 findAll' :: Connection -> IO [BrandDTO]
 findAll' = flip query_ "SELECT * FROM brands"
