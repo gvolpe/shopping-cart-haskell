@@ -1,5 +1,4 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Services.Brands
@@ -8,27 +7,25 @@ module Services.Brands
   )
 where
 
-import           Control.Monad.Catch
 import           Data.Functor                   ( void )
-import           Database.PostgreSQL.Simple
 import           Data.UUID                      ( UUID
                                                 , toText
                                                 )
 import           Data.UUID.V4                   ( nextRandom )
 import           Data.Text
+import           Database.PostgreSQL.Simple
 import           Domain.Brand
 import           GHC.Generics                   ( Generic )
 
 data Brands m = Brands
-  { findAllBrands :: m [Brand]
-  , createBrand :: BrandName -> m ()
+  { findAll :: m [Brand]
+  , create :: BrandName -> m ()
   }
 
 mkLiveBrands :: Connection -> IO (Brands IO)
-mkLiveBrands c = pure $ Brands
-  { findAllBrands = (fmap . fmap) toDomain (findAll' c)
-  , createBrand   = create' c
-  }
+mkLiveBrands c = pure $ Brands { findAll = (fmap . fmap) toDomain (findAll' c)
+                               , create  = create' c
+                               }
 
 data BrandDTO = BrandDTO
   { _brandId :: UUID

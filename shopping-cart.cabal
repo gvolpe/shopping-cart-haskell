@@ -15,7 +15,9 @@ extra-source-files:  CHANGELOG.md
 
 library
   exposed-modules:     Domain.Brand
+                     , Domain.Item
                      , Services.Brands
+                     , Services.Items
   build-depends:       base
                      , aeson
                      , async
@@ -23,6 +25,7 @@ library
                      , containers
                      , dhall
                      , exceptions
+                     , numhask
                      , postgresql-simple
                      , refined
                      , text
@@ -33,8 +36,7 @@ library
 
 executable shopping-cart
   main-is:             Main.hs
-  -- other-modules:
-  -- other-extensions:
+  hs-source-dirs:      app
   build-depends:       base >=4.12 && <4.13
                      , postgresql-simple
                      , shopping-cart

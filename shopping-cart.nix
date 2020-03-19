@@ -1,5 +1,6 @@
 { mkDerivation, aeson, async, base, bytestring, containers, dhall
-, exceptions, postgresql-simple, refined, stdenv, text, uuid, wreq
+, exceptions, numhask, postgresql-simple, refined, stdenv, text
+, uuid, wreq
 }:
 mkDerivation {
   pname = "shopping-cart";
@@ -8,7 +9,7 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    aeson async base bytestring containers dhall exceptions
+    aeson async base bytestring containers dhall exceptions numhask
     postgresql-simple refined text uuid wreq
   ];
   executableHaskellDepends = [ base postgresql-simple ];
