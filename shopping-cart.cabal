@@ -16,7 +16,12 @@ extra-source-files:  CHANGELOG.md
 library
   exposed-modules:     Domain.Brand
                      , Domain.Category
+                     , Domain.Cart
                      , Domain.Item
+                     , Domain.Order
+                     , Domain.Payment
+                     , Domain.User
+                     , Http.Clients.Payments
                      , Http.Handler
                      , Http.Params
                      , Http.Routes.Brands
@@ -24,11 +29,14 @@ library
                      , Http.Routes.Version
                      , Http.Server
                      , Logger
+                     , Programs.Checkout
                      , Refined.Instances
                      , Resources
                      , Services
                      , Services.Brands
                      , Services.Items
+                     , Services.Orders
+                     , Services.ShoppingCart
                      , Utils.Text
   build-depends:       base
                      , aeson
