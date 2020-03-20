@@ -3,7 +3,7 @@
 
 module Services.Brands
   ( Brands(..)
-  , mkLiveBrands
+  , mkBrands
   )
 where
 
@@ -20,10 +20,10 @@ data Brands m = Brands
   , create :: BrandName -> m ()
   }
 
-mkLiveBrands :: Connection -> IO (Brands IO)
-mkLiveBrands c = pure $ Brands { findAll = (fmap . fmap) toDomain (findAll' c)
-                               , create  = create' c
-                               }
+mkBrands :: Connection -> IO (Brands IO)
+mkBrands c = pure $ Brands { findAll = (fmap . fmap) toDomain (findAll' c)
+                           , create  = create' c
+                           }
 
 data BrandDTO = BrandDTO
   { _brandId :: UUID
@@ -31,8 +31,7 @@ data BrandDTO = BrandDTO
   } deriving (Generic, FromRow, ToRow, Show)
 
 toDomain :: BrandDTO -> Brand
-toDomain dto =
-  Brand (BrandId $ _brandId dto) (BrandName $ _brandName dto)
+toDomain dto = Brand (BrandId $ _brandId dto) (BrandName $ _brandName dto)
 
 findAll' :: Connection -> IO [BrandDTO]
 findAll' = flip query_ "SELECT * FROM brands"

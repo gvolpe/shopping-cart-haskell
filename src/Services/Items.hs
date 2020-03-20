@@ -2,7 +2,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 
-module Services.Items where
+module Services.Items
+  ( Items(..)
+  , mkItems
+  )
+where
 
 import           Data.Functor                   ( void )
 import           Data.Text                      ( Text )
@@ -24,13 +28,13 @@ data Items m = Items
   , update :: UpdateItem -> m ()
   }
 
-mkLiveItems :: Connection -> IO (Items IO)
-mkLiveItems c = pure $ Items { findAll  = (fmap . fmap) toDomain (findAll' c)
-                             , findBy   = (fmap . fmap) toDomain . findBy' c
-                             , findById = findById' c
-                             , create   = create' c
-                             , update   = update' c
-                             }
+mkItems :: Connection -> IO (Items IO)
+mkItems c = pure $ Items { findAll  = (fmap . fmap) toDomain (findAll' c)
+                         , findBy   = (fmap . fmap) toDomain . findBy' c
+                         , findById = findById' c
+                         , create   = create' c
+                         , update   = update' c
+                         }
 
 data ItemDTO = ItemDTO
   { _itemId :: UUID

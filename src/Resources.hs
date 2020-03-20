@@ -7,23 +7,29 @@ module Resources
 where
 
 import           Control.Monad.IO.Class
-import           Database.PostgreSQL.Simple
+import qualified Database.PostgreSQL.Simple    as P
+import qualified Database.Redis                as R
 import           Logger
 
--- Soon there will be more resources, e.g. Redis connection
 data Resources = Resources
-  { psql :: Connection
+  { psql :: P.Connection
+  , redis :: R.Connection
   }
 
 mkResources :: (Logger m, MonadIO m) => m Resources
-mkResources = Resources <$> psqlResource
+mkResources = Resources <$> psqlResource <*> redisResource
 
-psqlResource :: (Logger m, MonadIO m) => m Connection
+redisResource :: (Logger m, MonadIO m) => m R.Connection
+redisResource = do
+  logInfo "Acquiring Redis connection"
+  liftIO . R.checkedConnect $ R.defaultConnectInfo
+
+psqlResource :: (Logger m, MonadIO m) => m P.Connection
 psqlResource = do
   logInfo "Acquiring PostgreSQL connection"
-  liftIO $ connect ConnectInfo { connectHost     = "localhost"
-                               , connectPort     = 5432
-                               , connectUser     = "postgres"
-                               , connectPassword = ""
-                               , connectDatabase = "store"
-                               }
+  liftIO $ P.connect P.ConnectInfo { P.connectHost     = "localhost"
+                                   , P.connectPort     = 5432
+                                   , P.connectUser     = "postgres"
+                                   , P.connectPassword = ""
+                                   , P.connectDatabase = "store"
+                                   }

@@ -1,5 +1,10 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Domain.User where
 
 import           Data.UUID                      ( UUID )
+import           GHC.Generics                   ( Generic )
 
-type UserId = UUID
+newtype UserId = UserId {
+ unUserId :: UUID
+} deriving (Generic, Show)

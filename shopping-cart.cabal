@@ -46,6 +46,7 @@ library
                      , containers
                      , dhall
                      , exceptions
+                     , hedis
                      , postgresql-simple
                      , raw-strings-qq
                      , refined
