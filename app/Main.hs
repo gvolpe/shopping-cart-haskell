@@ -10,7 +10,6 @@ import           Services
 
 main :: IO ()
 main = do
-  putStrLn "Acquiring PSQL connection"
   res    <- mkResources
   brands <- SB.mkLiveBrands (psql res)
   items  <- SI.mkLiveItems (psql res)
