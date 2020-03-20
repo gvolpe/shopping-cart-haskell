@@ -1,6 +1,7 @@
 { mkDerivation, aeson, async, base, bytestring, containers, dhall
 , exceptions, postgresql-simple, raw-strings-qq, refined, servant
-, servant-server, stdenv, text, uuid, wai, wai-cors, warp, wreq
+, servant-server, stdenv, template-haskell, text, uuid, wai
+, wai-cors, warp, wreq
 }:
 mkDerivation {
   pname = "shopping-cart";
@@ -11,7 +12,7 @@ mkDerivation {
   libraryHaskellDepends = [
     aeson async base bytestring containers dhall exceptions
     postgresql-simple raw-strings-qq refined servant servant-server
-    text uuid wai wai-cors warp wreq
+    template-haskell text uuid wai wai-cors warp wreq
   ];
   executableHaskellDepends = [ base postgresql-simple ];
   description = "The Shopping Cart developed in PFP Scala for Haskell";

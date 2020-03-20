@@ -19,7 +19,11 @@ library
                      , Domain.Item
                      , Http.Handler
                      , Http.Params
+                     , Http.Routes.Brands
+                     , Http.Routes.Items
+                     , Http.Routes.Version
                      , Http.Server
+                     , Refined.Instances
                      , Services
                      , Services.Brands
                      , Services.Items
@@ -35,6 +39,7 @@ library
                      , refined
                      , servant
                      , servant-server
+                     , template-haskell
                      , text
                      , uuid
                      , wai
