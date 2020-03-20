@@ -27,6 +27,7 @@ library
                      , Services
                      , Services.Brands
                      , Services.Items
+                     , Utils.Text
   build-depends:       base
                      , aeson
                      , async
