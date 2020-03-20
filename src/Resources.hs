@@ -22,7 +22,7 @@ mkResources = Resources <$> psqlResource <*> redisResource
 redisResource :: (Logger m, MonadIO m) => m R.Connection
 redisResource = do
   logInfo "Acquiring Redis connection"
-  liftIO . R.checkedConnect $ R.defaultConnectInfo
+  liftIO $ R.checkedConnect R.defaultConnectInfo
 
 psqlResource :: (Logger m, MonadIO m) => m P.Connection
 psqlResource = do

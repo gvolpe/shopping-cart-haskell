@@ -42,12 +42,11 @@ get' conn items u = do
   undefined
 
 delete' :: Connection -> UserId -> IO ()
-delete' conn u = R.runRedis conn $ do
-  void $ R.del [C.pack . toString $ unUserId u]
+delete' conn u =
+  R.runRedis conn . void $ R.del [C.pack . toString $ unUserId u]
 
 removeItem' :: Connection -> UserId -> ItemId -> IO ()
-removeItem' conn u i = R.runRedis conn $ do
-  void $ R.hdel k [f]
+removeItem' conn u i = R.runRedis conn . void $ R.hdel k [f]
  where
   k = C.pack . toString $ unUserId u
   f = C.pack . toString $ unItemId i
