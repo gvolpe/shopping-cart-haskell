@@ -24,6 +24,7 @@ library
                      , Http.Routes.Version
                      , Http.Server
                      , Refined.Instances
+                     , Resources
                      , Services
                      , Services.Brands
                      , Services.Items
@@ -54,6 +55,5 @@ executable shopping-cart
   main-is:             Main.hs
   hs-source-dirs:      app
   build-depends:       base >=4.12 && <4.13
-                     , postgresql-simple
                      , shopping-cart
   default-language:    Haskell2010
