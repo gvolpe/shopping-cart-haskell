@@ -1,9 +1,10 @@
 module Services.Orders where
 
-import Domain.Cart
-import Domain.Order
-import Domain.Payment
-import Domain.User
+import           Domain.Cart
+import           Domain.Item                    ( Money )
+import           Domain.Order
+import           Domain.Payment
+import           Domain.User
 
 data Orders m = Orders
   { get :: UserId -> OrderId -> m (Maybe Order)

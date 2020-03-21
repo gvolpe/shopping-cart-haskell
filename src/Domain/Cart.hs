@@ -6,6 +6,5 @@ type Cart = [String]
 type CartItem = String
 type CartTotal = String
 type Quantity = Int
-type Money = Double
 
 type Expiration = Integer

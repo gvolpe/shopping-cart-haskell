@@ -11,8 +11,6 @@ where
 import           Data.Aeson
 import           Data.UUID                      ( UUID )
 import           Data.Text                      ( Text )
-import           Database.PostgreSQL.Simple.FromRow
-                                                ( FromRow )
 import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
 import           GHC.Generics                   ( Generic )

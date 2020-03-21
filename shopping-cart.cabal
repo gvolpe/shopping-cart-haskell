@@ -17,6 +17,7 @@ library
   exposed-modules:     Domain.Brand
                      , Domain.Category
                      , Domain.Cart
+                     , Domain.Checkout
                      , Domain.Item
                      , Domain.Order
                      , Domain.Payment
