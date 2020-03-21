@@ -26,4 +26,4 @@ jobs:
     - name: Build & Run Tests
       run: |
         cabal new-build
-        cabal new-test
+        cabal new-test --test-show-details=streaming

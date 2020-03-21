@@ -76,6 +76,7 @@ test-Suite shopping-cart-tests
                      , refined
                      , shopping-cart
                      , template-haskell
+                     , text
                      , uuid
   default-language:     Haskell2010
   ghc-options:         -Wall -threaded -with-rtsopts -N
