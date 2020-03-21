@@ -22,6 +22,7 @@ library
                      , Domain.Order
                      , Domain.Payment
                      , Domain.User
+                     , Http.Client
                      , Http.Clients.Payments
                      , Http.Handler
                      , Http.Params
@@ -48,6 +49,7 @@ library
                      , dhall
                      , exceptions
                      , hedis
+                     , lens
                      , postgresql-simple
                      , raw-strings-qq
                      , refined
@@ -68,4 +70,7 @@ executable shopping-cart
   hs-source-dirs:      app
   build-depends:       base >=4.12 && <4.13
                      , shopping-cart
+                     , refined
+                     , template-haskell
+                     , uuid
   default-language:    Haskell2010

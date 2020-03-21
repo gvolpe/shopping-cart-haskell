@@ -1,5 +1,5 @@
 { mkDerivation, aeson, async, base, bytestring, co-log-core
-, containers, dhall, exceptions, hedis, postgresql-simple
+, containers, dhall, exceptions, hedis, lens, postgresql-simple
 , raw-strings-qq, refined, servant, servant-server, stdenv
 , template-haskell, text, uuid, wai, wai-cors, warp, wreq
 }:
@@ -11,7 +11,7 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     aeson async base bytestring co-log-core containers dhall exceptions
-    hedis postgresql-simple raw-strings-qq refined servant
+    hedis lens postgresql-simple raw-strings-qq refined servant
     servant-server template-haskell text uuid wai wai-cors warp wreq
   ];
   executableHaskellDepends = [ base ];

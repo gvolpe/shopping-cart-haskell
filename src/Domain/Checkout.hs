@@ -1,14 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Domain.Checkout
-  ( Card(..)
-  , CardName(..)
-  , CardNumber(..)
-  , CardExpiration(..)
-  , CardCVV(..)
-  )
-where
+module Domain.Checkout where
 
 import           Data.Aeson
 import           Data.UUID                      ( UUID )
@@ -20,21 +13,26 @@ import           Database.PostgreSQL.Simple.ToRow
 import           GHC.Generics                   ( Generic )
 import           Refined
 
+type CardNamePred = Refined NonEmpty Text
+type CardNumberPred = Refined (SizeEqualTo 16) Int
+type CardExpirationPred = Refined (SizeEqualTo 4) Int
+type CardCVVPred = Refined (SizeEqualTo 3) Int
+
 newtype CardName = CardName {
-  unCardName :: Refined NonEmpty Text
+  unCardName :: CardNamePred
 } deriving (Generic, Show)
 --} deriving (Generic, ToRow, Show)
 
 newtype CardNumber = CardNumber {
-  unCardNumber :: Refined (SizeEqualTo 16) Int
+  unCardNumber :: CardNumberPred
 } deriving (Generic, Show)
 
 newtype CardExpiration = CardExpiration {
-  unCardExpiration :: Refined (SizeEqualTo 4) Int
+  unCardExpiration :: CardExpirationPred
 } deriving (Generic, Show)
 
 newtype CardCVV = CardCVV {
-  unCardCVV :: Refined (SizeEqualTo 3) Int
+  unCardCVV :: CardCVVPred
 } deriving (Generic, Show)
 
 data Card = Card
