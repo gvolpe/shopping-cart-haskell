@@ -70,6 +70,7 @@ test-Suite shopping-cart-tests
   hs-source-dirs:      test
   main-is:             Main.hs
   other-modules:       Payments.Test
+                     , Utils.TextTest
   build-depends:       base >= 4.12 && <4.13
                      , hedgehog
                      , refined

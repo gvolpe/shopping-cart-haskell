@@ -1,12 +1,10 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 module Main where
 
 import           Data.Functor                   ( void )
 import           Hedgehog
-import           Payments.Test
+import           Utils.TextTest
 
 main :: IO ()
 main = do
-  putStrLn "No tests yet"
+  void $ checkParallel utilTextTests
   --void $ checkParallel paymentTests
