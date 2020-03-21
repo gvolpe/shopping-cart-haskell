@@ -1,10 +1,12 @@
 module Main where
 
-import           Data.Functor                   ( void )
+import           Control.Monad                  ( unless )
 import           Hedgehog
+import           System.Exit
 import           Utils.TextTest
 
 main :: IO ()
 main = do
-  void $ checkParallel utilTextTests
-  --void $ checkParallel paymentTests
+  results <- sequence [checkParallel utilTextTests]
+  --checkParallel paymentTests
+  unless (and results) $ exitFailure

@@ -17,7 +17,7 @@ prop_capitalize = property $ do
   (forAll $ (capitalize . T.pack) <$> Gen.list (Range.linear 0 100) Gen.alpha)
     >>= \case
           (T.unpack -> x : xs) -> isUpper x === all isLower xs
-          (T.unpack -> _     ) -> pure ()
+          (T.unpack -> _     ) -> success -- empty text
 
 utilTextTests :: Group
 utilTextTests = $$(discover)
