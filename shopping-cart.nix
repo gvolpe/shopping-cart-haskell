@@ -1,7 +1,8 @@
 { mkDerivation, aeson, async, base, bytestring, co-log-core
-, containers, dhall, exceptions, hedis, lens, postgresql-simple
-, raw-strings-qq, refined, servant, servant-server, stdenv
-, template-haskell, text, uuid, wai, wai-cors, warp, wreq
+, containers, dhall, exceptions, hedgehog, hedis, lens
+, postgresql-simple, raw-strings-qq, refined, servant
+, servant-server, stdenv, template-haskell, text, uuid, wai
+, wai-cors, warp, wreq
 }:
 mkDerivation {
   pname = "shopping-cart";
@@ -14,7 +15,8 @@ mkDerivation {
     hedis lens postgresql-simple raw-strings-qq refined servant
     servant-server template-haskell text uuid wai wai-cors warp wreq
   ];
-  executableHaskellDepends = [ base ];
+  executableHaskellDepends = [ base refined template-haskell uuid ];
+  testHaskellDepends = [ base hedgehog refined template-haskell ];
   description = "The Shopping Cart developed in PFP Scala for Haskell";
   license = stdenv.lib.licenses.asl20;
 }
