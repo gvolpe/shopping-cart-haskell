@@ -15,7 +15,7 @@ import           GHC.Generics                   ( Generic )
 
 newtype PaymentId = PaymentId {
   unPaymentId :: UUID
-} deriving (Generic, ToRow, Show)
+} deriving (Eq, Generic, ToRow, Show)
 
 data Payment = Payment
   { paymentUserId :: UserId
