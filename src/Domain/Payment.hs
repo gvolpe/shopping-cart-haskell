@@ -1,5 +1,4 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Domain.Payment where
 

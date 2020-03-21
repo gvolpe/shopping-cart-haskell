@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Services.ShoppingCart where
 
 import qualified Data.ByteString.Char8         as C
@@ -18,7 +20,8 @@ data ShoppingCart m = ShoppingCart
   , update :: UserId -> Cart -> m ()
   }
 
-mkShoppingCart :: Connection -> Items IO -> Expiration -> IO (ShoppingCart IO)
+mkShoppingCart
+  :: Connection -> Items IO -> CartExpiration -> IO (ShoppingCart IO)
 mkShoppingCart c i exp = pure $ ShoppingCart { add        = add' c exp
                                              , get        = get' c i
                                              , delete     = delete' c
@@ -26,10 +29,10 @@ mkShoppingCart c i exp = pure $ ShoppingCart { add        = add' c exp
                                              , update     = update' c exp
                                              }
 
-add' :: Connection -> Expiration -> UserId -> ItemId -> Quantity -> IO ()
-add' conn exp u i q = R.runRedis conn $ do
+add' :: Connection -> CartExpiration -> UserId -> ItemId -> Quantity -> IO ()
+add' conn CartExpiration {..} u i q = R.runRedis conn $ do
   R.hset k f v
-  void $ R.expire k exp
+  void $ R.expire k unCartExpiration
  where
   k = C.pack . toString $ unUserId u
   f = C.pack . toString $ unItemId i
@@ -52,5 +55,5 @@ removeItem' conn u i = R.runRedis conn . void $ R.hdel k [f]
   f = C.pack . toString $ unItemId i
 
 -- TODO: implement
-update' :: Connection -> Expiration -> UserId -> Cart -> IO ()
+update' :: Connection -> CartExpiration -> UserId -> Cart -> IO ()
 update' = undefined

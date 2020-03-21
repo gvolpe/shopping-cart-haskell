@@ -1,6 +1,7 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Programs.Checkout where
 
-import           Data.UUID                      ( UUID )
 import           Domain.Cart
 import           Domain.Checkout
 import           Domain.Item
@@ -31,11 +32,9 @@ checkout'
   -> Card
   -> m OrderId
 checkout' pc sc so userId card = do
-  ctl <- SC.get sc userId
-  pid <- PC.processPayment pc payment
-  oid <- SO.create so userId pid [ctl] (Money 123)
+  CartTotal {..} <- SC.get sc userId
+  paymentId      <- PC.processPayment pc (payment cartTotal)
+  orderId        <- SO.create so userId paymentId cartItems cartTotal
   SC.delete sc userId
-  pure oid
- where
-  card = undefined :: Card
-  payment = Payment userId (Money 500) card
+  pure orderId
+  where payment t = Payment userId t card
