@@ -2,8 +2,6 @@
 
 module Services.ShoppingCart where
 
-import qualified Data.ByteString.Lazy.UTF8     as B
-import qualified Data.ByteString.Lazy          as B
 import qualified Data.ByteString.Char8         as C
 import           Data.Functor                   ( (<&>)
                                                 , void
@@ -17,12 +15,8 @@ import           Domain.Item
 import           Domain.User
 import           Services.Items                 ( Items )
 import qualified Services.Items                as SI
-import           Text.Read                      ( readMaybe )
-import           UnliftIO.Exception             ( Exception
-                                                , fromEitherM
-                                                )
-import Utils.Lift (liftMaybe)
-import           Utils.Text                     ( normalizeBS )
+import           Utils.Lift                     ( liftMaybe )
+import qualified Utils.Redis                   as R
 
 data ShoppingCart m = ShoppingCart
   { add :: UserId -> ItemId -> Quantity -> m ()
@@ -50,22 +44,19 @@ add' conn CartExpiration {..} u i q = R.runRedis conn $ do
   f = C.pack . UUID.toString $ unItemId i
   v = C.pack $ show q
 
-instance Exception R.Reply
-
 calcTotal :: [CartItem] -> Money
 calcTotal = foldMap
   (\CartItem {..} ->
-    (itemPrice cartItem) * (Money . fromIntegral $ unQuantity cartQuantity)
+    itemPrice cartItem * (Money . fromIntegral $ unQuantity cartQuantity)
   )
 
 get' :: Connection -> Items IO -> UserId -> IO CartTotal
 get' conn items u = do
-  res <- fromEitherM
-    (R.runRedis conn $ R.hgetall (C.pack . UUID.toString $ unUserId u))
+  res <- R.runRedisM conn $ R.hgetall (R.writeUUID $ unUserId u)
   its <- wither
     (\(k, v) -> do
-      it <- liftMaybe (ItemId <$> UUID.fromText (normalizeBS k))
-      qt <- liftMaybe (Quantity <$> (readMaybe . B.toString $ B.fromStrict v))
+      it <- liftMaybe $ R.readUUID ItemId k
+      qt <- liftMaybe $ R.readInt Quantity v
       (<&> (`CartItem` qt)) <$> SI.findById items it
     )
     res

@@ -40,6 +40,7 @@ library
                      , Services.Orders
                      , Services.ShoppingCart
                      , Utils.Lift
+                     , Utils.Redis
                      , Utils.Text
   build-depends:       base
                      , aeson
