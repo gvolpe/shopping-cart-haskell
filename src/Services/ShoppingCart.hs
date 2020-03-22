@@ -42,7 +42,7 @@ add' conn CartExpiration {..} u i q = R.runRedis conn $ do
  where
   k = C.pack . UUID.toString $ unUserId u
   f = C.pack . UUID.toString $ unItemId i
-  v = C.pack $ show q
+  v = C.pack . show $ unQuantity q
 
 calcTotal :: [CartItem] -> Money
 calcTotal = foldMap

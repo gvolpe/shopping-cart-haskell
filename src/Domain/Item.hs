@@ -56,6 +56,11 @@ data Item = Item
 type CreateItem = Item
 type UpdateItem = Item
 
+instance FromJSON ItemId where
+  parseJSON v = ItemId <$> parseJSON v
+
+instance FromJSONKey ItemId where
+
 instance ToJSON Item where
   toJSON i = object
     [ "uuid" .= unItemId (itemId i)

@@ -4,7 +4,10 @@
 module Domain.Cart where
 
 import           Data.Aeson
+import           Data.Aeson.Types               ( Parser )
+import           Data.Bifunctor                 ( bimap )
 import           Data.Map                       ( Map )
+import qualified Data.Map                      as M
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
@@ -37,22 +40,18 @@ newtype CartExpiration = CartExpiration {
   unCartExpiration :: Integer
 } deriving (Generic, ToRow, Show)
 
-instance FromJSON ItemId where
-  parseJSON (Object v) = ItemId <$> v .: "uuid"
-
-instance FromJSONKey ItemId
-
 instance FromJSON Quantity where
-  parseJSON (Object v) = Quantity <$> v .: "quantity"
+  parseJSON v = Quantity <$> parseJSON v
 
 instance FromJSON Cart where
-  parseJSON v = Cart <$> parseJSON v
+  parseJSON = withObject "Cart json" $ \o -> do
+    x <- o .: "items" :: Parser (Map UUID Int)
+    return $ Cart (M.fromList $ items x)
+    where items x = bimap ItemId Quantity <$> M.toList x
 
 instance ToJSON CartItem where
-  toJSON i = object
-    [ "item" .= toJSON (cartItem i)
-    , "quantity" .= toJSON (unQuantity $ cartQuantity i)
-    ]
+  toJSON i =
+    object ["item" .= cartItem i, "quantity" .= unQuantity (cartQuantity i)]
 
 instance ToJSON CartTotal where
   toJSON t = object
