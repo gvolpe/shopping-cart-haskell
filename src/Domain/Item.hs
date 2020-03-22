@@ -27,7 +27,7 @@ import           GHC.Real                       ( Ratio )
 
 newtype ItemId = ItemId {
  unItemId :: UUID
-} deriving (Generic, ToRow, Show)
+} deriving (Eq, Generic, Ord, Show, ToRow)
 
 newtype ItemName = ItemName {
  unItemName :: Text

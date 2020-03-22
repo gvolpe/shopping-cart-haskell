@@ -37,6 +37,17 @@ newtype CartExpiration = CartExpiration {
   unCartExpiration :: Integer
 } deriving (Generic, ToRow, Show)
 
+instance FromJSON ItemId where
+  parseJSON (Object v) = ItemId <$> v .: "uuid"
+
+instance FromJSONKey ItemId
+
+instance FromJSON Quantity where
+  parseJSON (Object v) = Quantity <$> v .: "quantity"
+
+instance FromJSON Cart where
+  parseJSON v = Cart <$> parseJSON v
+
 instance ToJSON CartItem where
   toJSON i = object
     [ "item" .= toJSON (cartItem i)

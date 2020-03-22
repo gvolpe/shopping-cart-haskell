@@ -1,8 +1,10 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Http.Handler where
 
 import           Control.Monad.IO.Class         ( liftIO )
+import           Data.Foldable                  ( traverse_ )
+import qualified Data.Map                      as M
 import           Data.Monoid                    ( (<>) )
 import qualified Data.UUID                     as UUID
 import           Domain.Brand
@@ -34,6 +36,16 @@ findItems i Nothing = do
   liftIO $ SI.findAll i
 
 findCartBy :: ShoppingCart IO -> UserId -> Handler CartTotal
-findCartBy s uid = do
-  logInfo $ "[Shopping Cart] - Find by UserId: " <> UUID.toText (unUserId uid)
+findCartBy s uid@UserId {..} = do
+  logInfo $ "[Shopping Cart] - Find by UserId: " <> UUID.toText unUserId
   liftIO $ SC.get s uid
+
+addToCart :: ShoppingCart IO -> UserId -> Cart -> Handler ()
+addToCart s uid@UserId {..} Cart {..} = do
+  logInfo $ "[Shopping Cart] - Add items for UserId: " <> UUID.toText unUserId
+  liftIO $ traverse_ (\(i, q) -> SC.add s uid i q) (M.toList unCart)
+
+deleteCartBy :: ShoppingCart IO -> UserId -> Handler ()
+deleteCartBy s uid@UserId {..} = do
+  logInfo $ "[Shopping Cart] - Delete Cart by UserId: " <> UUID.toText unUserId
+  liftIO $ SC.delete s uid
