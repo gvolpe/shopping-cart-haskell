@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingVia, DerivingStrategies #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingVia #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Domain.Item

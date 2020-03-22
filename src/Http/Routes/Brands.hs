@@ -1,16 +1,24 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Http.Routes.Brands where
 
+import           Control.Monad.IO.Class         ( liftIO )
 import           Domain.Brand
-import qualified Http.Handler                   as Handler
 import           Http.Params
 import           Http.Routes.Version
+import           Logger
 import           Servant
-import           Services.Brands
+import           Services.Brands                ( Brands )
+import qualified Services.Brands               as SB
 
 type BrandsAPI =
   ApiVersion :> "brands" :> Get '[JSON] [Brand]
 
 brandsServer :: Brands IO -> Server BrandsAPI
-brandsServer = Handler.findBrands
+brandsServer = findBrands
+
+findBrands :: Brands IO -> Handler [Brand]
+findBrands b = do
+  logInfo "[Brands] - Find all"
+  liftIO $ SB.findAll b

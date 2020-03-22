@@ -4,9 +4,6 @@ module Http.Server (runServer) where
 
 import           Data.Aeson
 import           Data.Proxy
-import           Data.Text
-import qualified Http.Handler                   as Handler
-import           Http.Params
 import           Http.Routes.Brands
 import           Http.Routes.Cart
 import           Http.Routes.Items
