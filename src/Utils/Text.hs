@@ -2,11 +2,13 @@
 
 module Utils.Text where
 
+import qualified Data.ByteString.Char8         as C
 import           Data.Char                      ( toLower
                                                 , toUpper
                                                 )
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
+import           Data.Text.Encoding
 
 capitalize :: Text -> Text
 capitalize "" = ""
@@ -17,3 +19,6 @@ capitalize cs =
 
 normalize :: Text -> Text
 normalize = capitalize . T.filter (/= '"')
+
+normalizeBS :: C.ByteString -> Text
+normalizeBS bs = T.filter (/= '"') (decodeUtf8 bs)

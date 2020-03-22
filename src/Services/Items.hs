@@ -9,6 +9,7 @@ module Services.Items
 where
 
 import           Data.Functor                   ( void )
+import           Data.Maybe                     ( listToMaybe )
 import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple
@@ -23,7 +24,7 @@ import           Text.RawString.QQ
 data Items m = Items
   { findAll :: m [Item]
   , findBy :: BrandName -> m [Item]
-  , findById :: BrandId -> m (Maybe Item)
+  , findById :: ItemId -> m (Maybe Item)
   , create :: CreateItem -> m ()
   , update :: UpdateItem -> m ()
   }
@@ -31,7 +32,7 @@ data Items m = Items
 mkItems :: Connection -> IO (Items IO)
 mkItems c = pure $ Items { findAll  = (fmap . fmap) toDomain (findAll' c)
                          , findBy   = (fmap . fmap) toDomain . findBy' c
-                         , findById = findById' c
+                         , findById = (fmap . fmap) toDomain . findById' c
                          , create   = create' c
                          , update   = update' c
                          }
@@ -80,8 +81,16 @@ selectByBrandQuery =
 findBy' :: Connection -> BrandName -> IO [ItemDTO]
 findBy' = flip query selectByBrandQuery
 
-findById' :: Connection -> BrandId -> IO (Maybe Item)
-findById' _ _ = pure Nothing
+selectByItemIdQuery :: Query
+selectByItemIdQuery =
+  [r|SELECT i.uuid, i.name, i.description, i.price, b.uuid, b.name, c.uuid, c.name
+     FROM items AS i
+     INNER JOIN brands AS b ON i.brand_id = b.uuid
+     INNER JOIN categories AS c ON i.category_id = c.uuid
+     WHERE i.uuid = ?|]
+
+findById' :: Connection -> ItemId -> IO (Maybe ItemDTO)
+findById' c i = listToMaybe <$> query c selectByItemIdQuery i
 
 create' :: Connection -> CreateItem -> IO ()
 create' _ _ = pure ()

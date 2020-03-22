@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingVia, DerivingStrategies #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Domain.Item
@@ -13,8 +13,9 @@ module Domain.Item
 where
 
 import           Data.Aeson
-import           Data.UUID                      ( UUID )
+import           Data.Monoid                    ( Sum(..) )
 import           Data.Text                      ( Text )
+import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple.FromRow
                                                 ( FromRow )
 import           Database.PostgreSQL.Simple.ToRow
@@ -38,7 +39,10 @@ newtype ItemDescription = ItemDescription {
 
 newtype Money = Money {
  unMoney :: Double
-} deriving (Generic, Show)
+} deriving stock (Generic, Show)
+  deriving Num via (Sum Double)
+  deriving Semigroup via (Sum Double)
+  deriving Monoid via (Sum Double)
 
 data Item = Item
   { itemId :: ItemId
@@ -58,4 +62,5 @@ instance ToJSON Item where
     , "name" .= unItemName (itemName i)
     , "description" .= unItemDescription (itemDescription i)
     , "brand" .= toJSON (itemBrand i)
-    , "category" .= toJSON (itemCategory i)]
+    , "category" .= toJSON (itemCategory i)
+    ]

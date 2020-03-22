@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-
 module Main where
 
 import           Domain.Cart                    ( CartExpiration(..) )
@@ -20,5 +17,4 @@ main = do
   cart   <- SC.mkShoppingCart (redis res) items exp
   client <- P.mkPaymentClient
   runServer (Services brands items client)
- where
-  exp  = CartExpiration (30 * 60)
+  where exp = CartExpiration (30 * 60)
