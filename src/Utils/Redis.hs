@@ -1,3 +1,5 @@
+{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
+
 module Utils.Redis where
 
 import qualified Data.ByteString.Char8         as C
@@ -15,11 +17,11 @@ import           UnliftIO.Exception             ( Exception
 
 instance Exception R.Reply
 
+readInt :: forall n a . (Integral n, Read n) => (n -> a) -> C.ByteString -> Maybe a
+readInt f x = f <$> (readMaybe . B.toString $ B.fromStrict x)
+
 readUUID :: (UUID -> a) -> C.ByteString -> Maybe a
 readUUID f x = f <$> UUID.fromText (normalizeBS x)
-
-readInt :: (Int -> a) -> C.ByteString -> Maybe a
-readInt f x = f <$> (readMaybe . B.toString $ B.fromStrict x)
 
 writeUUID :: UUID -> C.ByteString
 writeUUID = C.pack . UUID.toString
