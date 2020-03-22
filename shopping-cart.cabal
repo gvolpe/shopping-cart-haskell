@@ -27,6 +27,7 @@ library
                      , Http.Handler
                      , Http.Params
                      , Http.Routes.Brands
+                     , Http.Routes.Cart
                      , Http.Routes.Items
                      , Http.Routes.Version
                      , Http.Server

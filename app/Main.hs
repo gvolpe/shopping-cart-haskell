@@ -16,5 +16,5 @@ main = do
   items  <- SI.mkItems (psql res)
   cart   <- SC.mkShoppingCart (redis res) items exp
   client <- P.mkPaymentClient
-  runServer (Services brands items client)
+  runServer (Services brands cart items client)
   where exp = CartExpiration (30 * 60)

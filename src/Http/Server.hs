@@ -8,6 +8,7 @@ import           Data.Text
 import qualified Http.Handler                   as Handler
 import           Http.Params
 import           Http.Routes.Brands
+import           Http.Routes.Cart
 import           Http.Routes.Items
 import           Servant
 import           Servant.API
@@ -16,10 +17,10 @@ import           Network.Wai.Handler.Warp       ( run )
 import           Network.Wai.Middleware.Cors    ( simpleCors )
 import           Services
 
-type API = BrandsAPI :<|> ItemsAPI
+type API = BrandsAPI :<|> ItemsAPI :<|> CartAPI
 
 server :: Services IO -> Server API
-server s = brandsServer (brands s) :<|> itemsServer (items s)
+server s = brandsServer (brands s) :<|> itemsServer (items s) :<|> cartServer (cart s)
 
 api :: Services IO -> Application
 api s = serve (Proxy :: Proxy API) (server s)

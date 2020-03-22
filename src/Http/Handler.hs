@@ -4,8 +4,11 @@ module Http.Handler where
 
 import           Control.Monad.IO.Class         ( liftIO )
 import           Data.Monoid                    ( (<>) )
+import qualified Data.UUID                     as UUID
 import           Domain.Brand
+import           Domain.Cart
 import           Domain.Item
+import           Domain.User
 import           Http.Params
 import           Logger
 import           Servant
@@ -13,6 +16,8 @@ import           Services.Brands                ( Brands )
 import qualified Services.Brands               as SB
 import           Services.Items                 ( Items )
 import qualified Services.Items                as SI
+import           Services.ShoppingCart          ( ShoppingCart )
+import qualified Services.ShoppingCart         as SC
 
 findBrands :: Brands IO -> Handler [Brand]
 findBrands b = do
@@ -27,3 +32,8 @@ findItems i (Just bn) = do
 findItems i Nothing = do
   logInfo "[Items] - Find all"
   liftIO $ SI.findAll i
+
+findCartBy :: ShoppingCart IO -> UserId -> Handler CartTotal
+findCartBy s uid = do
+  logInfo $ "[Shopping Cart] - Find by UserId: " <> UUID.toText (unUserId uid)
+  liftIO $ SC.get s uid

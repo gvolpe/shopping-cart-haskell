@@ -1,7 +1,9 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Domain.Cart where
 
+import           Data.Aeson
 import           Data.Map                       ( Map )
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple.ToRow
@@ -34,3 +36,13 @@ newtype Quantity = Quantity {
 newtype CartExpiration = CartExpiration {
   unCartExpiration :: Integer
 } deriving (Generic, ToRow, Show)
+
+instance ToJSON CartItem where
+  toJSON i = object
+    [ "item" .= toJSON (cartItem i)
+    , "quantity" .= toJSON (unQuantity $ cartQuantity i)
+    ]
+
+instance ToJSON CartTotal where
+  toJSON t = object
+    ["items" .= toJSON (cartItems t), "total" .= toJSON (unMoney $ cartTotal t)]
