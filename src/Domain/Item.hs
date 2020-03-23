@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingVia #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Item
   ( ItemId(..)
@@ -62,10 +62,10 @@ instance FromJSON ItemId where
 instance FromJSONKey ItemId where
 
 instance ToJSON Item where
-  toJSON i = object
-    [ "uuid" .= unItemId (itemId i)
-    , "name" .= unItemName (itemName i)
-    , "description" .= unItemDescription (itemDescription i)
-    , "brand" .= toJSON (itemBrand i)
-    , "category" .= toJSON (itemCategory i)
+  toJSON Item {..} = object
+    [ "uuid" .= unItemId itemId
+    , "name" .= unItemName itemName
+    , "description" .= unItemDescription itemDescription
+    , "brand" .= toJSON itemBrand
+    , "category" .= toJSON itemCategory
     ]

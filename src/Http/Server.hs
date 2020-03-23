@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Http.Server
   ( runServer
@@ -21,8 +22,8 @@ import           Services
 type API = BrandsAPI :<|> ItemsAPI :<|> CartAPI
 
 server :: Services IO -> Server API
-server s =
-  brandsServer (brands s) :<|> itemsServer (items s) :<|> cartServer (cart s)
+server Services {..} =
+  brandsServer brands :<|> itemsServer items :<|> cartServer cart
 
 api :: Services IO -> Application
 api s = serve (Proxy :: Proxy API) (server s)

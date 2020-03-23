@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Services.Brands
   ( Brands(..)
@@ -31,14 +31,14 @@ data BrandDTO = BrandDTO
   } deriving (Generic, FromRow, ToRow, Show)
 
 toDomain :: BrandDTO -> Brand
-toDomain dto = Brand (BrandId $ _brandId dto) (BrandName $ _brandName dto)
+toDomain BrandDTO {..} = Brand (BrandId _brandId) (BrandName _brandName)
 
 findAll' :: Connection -> IO [BrandDTO]
 findAll' = flip query_ "SELECT * FROM brands"
 
 create' :: Connection -> BrandName -> IO ()
-create' c b = do
+create' c BrandName {..} = do
   uuid <- nextRandom
   void $ executeMany c
                      "INSERT INTO brands (uuid, name) VALUES (?, ?)"
-                     [(uuid, unBrandName b)]
+                     [(uuid, unBrandName)]

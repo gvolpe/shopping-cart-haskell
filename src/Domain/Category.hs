@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Category
   ( CategoryId(..)
@@ -31,7 +31,5 @@ data Category = Category
   } deriving (Generic, Show)
 
 instance ToJSON Category where
-  toJSON b = object
-    [ "uuid" .= unCategoryId (categoryId b)
-    , "name" .= unCategoryName (categoryName b)
-    ]
+  toJSON Category {..} = object
+    ["uuid" .= unCategoryId categoryId, "name" .= unCategoryName categoryName]

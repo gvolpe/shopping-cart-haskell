@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module Services.Items
@@ -49,15 +49,14 @@ data ItemDTO = ItemDTO
   } deriving (Generic, FromRow, Show)
 
 toDomain :: ItemDTO -> Item
-toDomain dto = Item
-  { itemId          = ItemId $ _itemId dto
-  , itemName        = ItemName $ _itemName dto
-  , itemDescription = ItemDescription $ _itemDescription dto
-  , itemPrice       = Money . fromRational $ _itemPrice dto
-  , itemBrand       = Brand (BrandId $ _itemBrandId dto)
-                            (BrandName $ _itemBrandName dto)
-  , itemCategory    = Category (CategoryId $ _itemCategoryId dto)
-                               (CategoryName $ _itemCategoryName dto)
+toDomain ItemDTO {..} = Item
+  { itemId          = ItemId _itemId
+  , itemName        = ItemName _itemName
+  , itemDescription = ItemDescription _itemDescription
+  , itemPrice       = Money $ fromRational _itemPrice
+  , itemBrand       = Brand (BrandId _itemBrandId) (BrandName _itemBrandName)
+  , itemCategory    = Category (CategoryId _itemCategoryId)
+                               (CategoryName _itemCategoryName)
   }
 
 selectAllQuery :: Query

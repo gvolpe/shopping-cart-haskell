@@ -1,15 +1,11 @@
 {-# LANGUAGE DataKinds, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Checkout where
 
 import           Data.Aeson
 import           Data.UUID                      ( UUID )
 import           Data.Text                      ( Text )
-import           Database.PostgreSQL.Simple.FromRow
-                                                ( FromRow )
-import           Database.PostgreSQL.Simple.ToRow
-                                                ( ToRow )
 import           GHC.Generics                   ( Generic )
 import           Refined
 
@@ -21,7 +17,6 @@ type CardCVVPred = Refined (SizeEqualTo 3) Int
 newtype CardName = CardName {
   unCardName :: CardNamePred
 } deriving (Generic, Show)
---} deriving (Generic, ToRow, Show)
 
 newtype CardNumber = CardNumber {
   unCardNumber :: CardNumberPred
@@ -43,9 +38,9 @@ data Card = Card
   } deriving (Generic, Show)
 
 instance ToJSON Card where
-  toJSON c = object
-    [ "name" .= unrefine (unCardName $ cardName c)
-    , "number" .= unrefine (unCardNumber $ cardNumber c)
-    , "expiration" .= unrefine (unCardExpiration $ cardExpiration c)
-    , "cvv" .= unrefine (unCardCVV $ cardCVV c)
+  toJSON Card {..} = object
+    [ "name" .= unrefine (unCardName cardName)
+    , "number" .= unrefine (unCardNumber cardNumber)
+    , "expiration" .= unrefine (unCardExpiration cardExpiration)
+    , "cvv" .= unrefine (unCardCVV cardCVV)
     ]

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Brand
   ( BrandId(..)
@@ -29,5 +29,5 @@ data Brand = Brand
   } deriving (Generic, Show)
 
 instance ToJSON Brand where
-  toJSON b = object
-    ["uuid" .= unBrandId (brandId b), "name" .= unBrandName (brandName b)]
+  toJSON Brand {..} =
+    object ["uuid" .= unBrandId brandId, "name" .= unBrandName brandName]

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
 
 module Domain.Payment where
@@ -27,8 +27,8 @@ instance FromJSON PaymentId where
   parseJSON (Object v) = PaymentId <$> v .: "paymentId"
 
 instance ToJSON Payment where
-  toJSON p = object
-    [ "user_id" .= unUserId (paymentUserId p)
-    , "total" .= unMoney (paymentTotal p)
-    , "card" .= toJSON (paymentCard p)
+  toJSON Payment {..} = object
+    [ "user_id" .= unUserId paymentUserId
+    , "total" .= unMoney paymentTotal
+    , "card" .= toJSON paymentCard
     ]

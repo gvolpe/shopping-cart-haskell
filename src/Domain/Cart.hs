@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Cart where
 
@@ -50,9 +50,9 @@ instance FromJSON Cart where
     where items x = bimap ItemId Quantity <$> M.toList x
 
 instance ToJSON CartItem where
-  toJSON i =
-    object ["item" .= cartItem i, "quantity" .= unQuantity (cartQuantity i)]
+  toJSON CartItem {..} =
+    object ["item" .= cartItem, "quantity" .= unQuantity cartQuantity]
 
 instance ToJSON CartTotal where
-  toJSON t = object
-    ["items" .= toJSON (cartItems t), "total" .= toJSON (unMoney $ cartTotal t)]
+  toJSON CartTotal {..} =
+    object ["items" .= toJSON cartItems, "total" .= toJSON (unMoney cartTotal)]
