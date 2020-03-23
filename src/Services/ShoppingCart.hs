@@ -51,8 +51,8 @@ calcTotal = foldMap
   )
 
 get' :: Connection -> Items IO -> UserId -> IO CartTotal
-get' conn items u = do
-  res <- R.runRedisM conn $ R.hgetall (R.writeUUID $ unUserId u)
+get' conn items UserId {..} = do
+  res <- R.runRedisM conn $ R.hgetall (R.writeUUID unUserId)
   its <- wither
     (\(k, v) -> do
       it <- liftMaybe $ R.readUUID ItemId k
