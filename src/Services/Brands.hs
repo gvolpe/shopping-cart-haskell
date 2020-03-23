@@ -10,7 +10,7 @@ where
 import           Data.Functor                   ( void )
 import           Data.UUID                      ( UUID )
 import           Data.UUID.V4                   ( nextRandom )
-import           Data.Text
+import           Data.Text                      ( Text )
 import           Database.PostgreSQL.Simple
 import           Domain.Brand
 import           GHC.Generics                   ( Generic )

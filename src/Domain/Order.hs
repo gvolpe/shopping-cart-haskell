@@ -6,8 +6,7 @@ import           Data.Aeson
 import           Data.Map
 import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
-import           Database.PostgreSQL.Simple.ToRow
-                                                ( ToRow )
+import           Database.PostgreSQL.Simple
 import           Domain.Cart                    ( Quantity )
 import           Domain.Item                    ( ItemId
                                                 , Money
@@ -17,7 +16,7 @@ import           GHC.Generics                   ( Generic )
 
 newtype OrderId = OrderId {
   unOrderId :: UUID
-} deriving (Generic, ToRow, Show)
+} deriving (Eq, Generic, Ord, Show, ToRow)
 
 data Order = Order
   { orderId :: OrderId
