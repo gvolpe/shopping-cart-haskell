@@ -1,6 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Services.ShoppingCart where
+module Services.ShoppingCart
+  ( ShoppingCart(..)
+  , mkShoppingCart
+  )
+where
 
 import qualified Data.ByteString.Char8         as C
 import           Data.Functor                   ( (<&>)

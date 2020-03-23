@@ -1,6 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Programs.Checkout where
+module Programs.Checkout
+  ( Checkout(..)
+  , mkCheckout
+  )
+where
 
 import           Domain.Cart
 import           Domain.Checkout
@@ -19,9 +23,9 @@ data Checkout m = Checkout
   { checkout :: UserId -> Card -> m OrderId
   }
 
-mkCheckoutProgram
+mkCheckout
   :: Monad m => PaymentClient m -> ShoppingCart m -> Orders m -> m (Checkout m)
-mkCheckoutProgram p s o = pure $ Checkout (checkout' p s o)
+mkCheckout p s o = pure $ Checkout (checkout' p s o)
 
 checkout'
   :: Monad m

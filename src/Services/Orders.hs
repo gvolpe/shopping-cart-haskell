@@ -1,7 +1,11 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
-module Services.Orders where
+module Services.Orders
+  ( Orders(..)
+  , mkOrders
+  )
+where
 
 import           Data.Aeson                     ( decode
                                                 , toJSON

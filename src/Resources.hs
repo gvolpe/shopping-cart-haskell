@@ -11,13 +11,13 @@ import qualified Database.PostgreSQL.Simple    as P
 import qualified Database.Redis                as R
 import           Logger
 
-data Resources = Resources
+data Resources = Res
   { psql :: P.Connection
   , redis :: R.Connection
   }
 
 mkResources :: (Logger m, MonadIO m) => m Resources
-mkResources = Resources <$> psqlResource <*> redisResource
+mkResources = Res <$> psqlResource <*> redisResource
 
 redisResource :: (Logger m, MonadIO m) => m R.Connection
 redisResource = do
