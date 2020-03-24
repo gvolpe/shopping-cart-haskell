@@ -9,7 +9,7 @@ where
 import           Control.Monad.IO.Class
 import qualified Database.PostgreSQL.Simple    as P
 import qualified Database.Redis                as R
-import           Logger
+import           Effects.Logger
 
 data Resources = Res
   { psql :: P.Connection

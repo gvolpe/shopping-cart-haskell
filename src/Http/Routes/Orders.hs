@@ -9,9 +9,9 @@ import qualified Data.Map                      as M
 import qualified Data.UUID                     as UUID
 import           Domain.Order
 import           Domain.User
+import           Effects.Logger
 import           Http.Params
 import           Http.Routes.Version
-import           Logger
 import           Servant
 import           Services.Orders                ( Orders )
 import qualified Services.Orders               as SO

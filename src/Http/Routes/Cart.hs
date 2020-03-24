@@ -9,9 +9,9 @@ import qualified Data.Map                      as M
 import qualified Data.UUID                     as UUID
 import           Domain.Cart
 import           Domain.User
+import           Effects.Logger
 import           Http.Params
 import           Http.Routes.Version
-import           Logger
 import           Servant
 import           Services.ShoppingCart          ( ShoppingCart )
 import qualified Services.ShoppingCart         as SC

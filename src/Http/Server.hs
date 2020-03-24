@@ -8,12 +8,12 @@ where
 
 import           Data.Aeson
 import           Data.Proxy
+import           Effects.Logger
 import           Http.Routes.Brands
 import           Http.Routes.Cart
 import           Http.Routes.Checkout
 import           Http.Routes.Items
 import           Http.Routes.Orders
-import           Logger
 import           Servant
 import           Servant.API
 import           Network.Wai                    ( Application )

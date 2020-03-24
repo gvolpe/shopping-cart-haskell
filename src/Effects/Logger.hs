@@ -1,4 +1,4 @@
-module Logger where
+module Effects.Logger where
 
 import           Control.Monad.IO.Class         ( MonadIO
                                                 , liftIO

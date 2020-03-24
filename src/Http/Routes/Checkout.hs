@@ -10,9 +10,9 @@ import qualified Data.UUID                     as UUID
 import           Domain.Checkout
 import           Domain.Order
 import           Domain.User
+import           Effects.Logger
 import           Http.Params
 import           Http.Routes.Version
-import           Logger
 import           Programs.Checkout              ( Checkout )
 import qualified Programs.Checkout             as PC
 import           Servant

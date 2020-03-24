@@ -5,9 +5,9 @@ module Http.Routes.Brands where
 
 import           Control.Monad.IO.Class         ( liftIO )
 import           Domain.Brand
+import           Effects.Logger
 import           Http.Params
 import           Http.Routes.Version
-import           Logger
 import           Servant
 import           Services.Brands                ( Brands )
 import qualified Services.Brands               as SB

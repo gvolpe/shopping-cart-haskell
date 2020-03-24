@@ -6,9 +6,9 @@ module Http.Routes.Items where
 import           Control.Monad.IO.Class         ( liftIO )
 import           Domain.Brand
 import           Domain.Item
+import           Effects.Logger
 import           Http.Params
 import           Http.Routes.Version
-import           Logger
 import           Servant
 import           Services.Items                 ( Items )
 import qualified Services.Items                as SI
