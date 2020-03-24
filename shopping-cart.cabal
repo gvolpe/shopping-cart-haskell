@@ -27,6 +27,7 @@ library
                      , Http.Params
                      , Http.Routes.Brands
                      , Http.Routes.Cart
+                     , Http.Routes.Checkout
                      , Http.Routes.Items
                      , Http.Routes.Orders
                      , Http.Routes.Version

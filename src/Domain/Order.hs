@@ -24,9 +24,12 @@ data Order = Order
   , orderTotal :: Money
   } deriving (Generic, Show)
 
+instance ToJSON OrderId where
+  toJSON i = toJSON $ unOrderId i
+
 instance ToJSON Order where
   toJSON Order {..} = object
-    [ "order_id" .= unOrderId orderId
+    [ "order_id" .= toJSON orderId
     , "payment_id" .= unPaymentId orderPaymentId
     , "items" .= toJSON orderItems
     , "total" .= unMoney orderTotal

@@ -10,6 +10,7 @@ import           Data.Aeson
 import           Data.Proxy
 import           Http.Routes.Brands
 import           Http.Routes.Cart
+import           Http.Routes.Checkout
 import           Http.Routes.Items
 import           Http.Routes.Orders
 import           Logger
@@ -20,12 +21,13 @@ import           Network.Wai.Handler.Warp       ( run )
 import           Network.Wai.Middleware.Cors    ( simpleCors )
 import           Services
 
-type API = BrandsAPI :<|> ItemsAPI :<|> CartAPI :<|> OrdersAPI
+type API = BrandsAPI :<|> ItemsAPI :<|> CartAPI :<|> CheckoutAPI :<|> OrdersAPI
 
 server :: Services IO -> Server API
 server Services {..} =
   brandsServer brands :<|> itemsServer items :<|>
-  cartServer cart :<|> ordersServer orders
+  cartServer cart :<|> checkoutServer checkout :<|>
+  ordersServer orders
 
 api :: Services IO -> Application
 api s = serve (Proxy :: Proxy API) (server s)

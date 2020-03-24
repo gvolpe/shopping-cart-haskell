@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Domain.Checkout where
 
@@ -8,6 +9,8 @@ import           Data.UUID                      ( UUID )
 import           Data.Text                      ( Text )
 import           GHC.Generics                   ( Generic )
 import           Refined
+import           Refined.Instances              ( )
+import           Refined.Orphan.Aeson
 
 type CardNamePred = Refined NonEmpty Text
 type CardNumberPred = Refined (SizeEqualTo 16) Int
@@ -36,6 +39,14 @@ data Card = Card
   , cardExpiration :: CardExpiration
   , cardCVV :: CardCVV
   } deriving (Generic, Show)
+
+instance FromJSON Card where
+  parseJSON = withObject "Card json" $ \o -> do
+    n <- o .: "name"
+    r <- o .: "number"
+    e <- o .: "expiration"
+    c <- o .: "cvv"
+    return $ Card (CardName n) (CardNumber r) (CardExpiration e) (CardCVV c)
 
 instance ToJSON Card where
   toJSON Card {..} = object
