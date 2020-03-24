@@ -57,6 +57,7 @@ library
                      , postgresql-simple
                      , raw-strings-qq
                      , refined
+                     , retry
                      , servant
                      , servant-server
                      , template-haskell
