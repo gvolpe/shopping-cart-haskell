@@ -50,14 +50,14 @@ data OrderDTO = OrderDTO
   , _orderUserId :: UUID
   , _orderPaymentId :: UUID
   , _orderItems :: [CartItem]
-  , _orderTotal :: Double
+  , _orderTotal :: Rational
   } deriving (Generic, FromRow, Show)
 
 toDomain :: OrderDTO -> Order
 toDomain OrderDTO {..} = Order { orderId        = OrderId _orderId
                                , orderPaymentId = PaymentId _orderPaymentId
                                , orderItems     = parseItems _orderItems
-                               , orderTotal     = Money _orderTotal
+                               , orderTotal = Money $ fromRational _orderTotal
                                }
 
 parseItems :: [CartItem] -> Map ItemId Quantity

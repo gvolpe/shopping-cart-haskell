@@ -18,7 +18,6 @@ import           Domain.Brand
 import           Domain.Category
 import           Domain.Item
 import           GHC.Generics                   ( Generic )
-import           GHC.Real                       ( Rational )
 import           Text.RawString.QQ
 
 data Items m = Items
