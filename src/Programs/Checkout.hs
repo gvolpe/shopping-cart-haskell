@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Programs.Checkout
   ( Checkout(..)
@@ -14,31 +14,41 @@ import           Domain.Payment
 import           Domain.User
 import           Http.Clients.Payments          ( PaymentClient )
 import qualified Http.Clients.Payments         as PC
+import           Logger
 import           Services.Orders                ( Orders )
 import qualified Services.Orders               as SO
 import           Services.ShoppingCart          ( ShoppingCart )
 import qualified Services.ShoppingCart         as SC
 
 data Checkout m = Checkout
-  { checkout :: UserId -> Card -> m OrderId
+  { process :: UserId -> Card -> m OrderId
   }
 
 mkCheckout
-  :: Monad m => PaymentClient m -> ShoppingCart m -> Orders m -> m (Checkout m)
-mkCheckout p s o = pure $ Checkout (checkout' p s o)
+  :: (Logger m, Monad m)
+  => PaymentClient m
+  -> ShoppingCart m
+  -> Orders m
+  -> m (Checkout m)
+mkCheckout p s o = pure $ Checkout (process' p s o)
 
-checkout'
-  :: Monad m
+-- TODO: Move logging to retry functions
+process'
+  :: (Logger m, Monad m)
   => PaymentClient m
   -> ShoppingCart m
   -> Orders m
   -> UserId
   -> Card
   -> m OrderId
-checkout' pc sc so userId card = do
+process' pc sc so userId card = do
+  logInfo "[Checkout] - Retrieving shopping cart for user"
   CartTotal {..} <- SC.get sc userId
-  paymentId      <- PC.processPayment pc (payment cartTotal)
-  orderId        <- SO.create so userId paymentId cartItems cartTotal
+  logInfo "[Checkout] - Processing payment"
+  paymentId <- PC.processPayment pc (payment cartTotal)
+  logInfo "[Checkout] - Creating order"
+  orderId <- SO.create so userId paymentId cartItems cartTotal
+  logInfo "[Checkout] - Deleting shopping cart from cache"
   SC.delete sc userId
   pure orderId
   where payment t = Payment userId t card

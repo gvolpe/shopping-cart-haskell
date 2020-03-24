@@ -22,5 +22,5 @@ main = do
   orders   <- SO.mkOrders psql
   client   <- P.mkPaymentClient
   checkout <- PC.mkCheckout client cart orders
-  runServer (Services brands cart items orders client)
+  runServer (Services brands cart checkout items orders client)
   where exp = CartExpiration (30 * 60)
