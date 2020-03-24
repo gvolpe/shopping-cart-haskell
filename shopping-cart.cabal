@@ -28,6 +28,7 @@ library
                      , Http.Routes.Brands
                      , Http.Routes.Cart
                      , Http.Routes.Items
+                     , Http.Routes.Orders
                      , Http.Routes.Version
                      , Http.Server
                      , Logger

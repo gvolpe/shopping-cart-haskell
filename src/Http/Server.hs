@@ -11,6 +11,7 @@ import           Data.Proxy
 import           Http.Routes.Brands
 import           Http.Routes.Cart
 import           Http.Routes.Items
+import           Http.Routes.Orders
 import           Logger
 import           Servant
 import           Servant.API
@@ -19,11 +20,12 @@ import           Network.Wai.Handler.Warp       ( run )
 import           Network.Wai.Middleware.Cors    ( simpleCors )
 import           Services
 
-type API = BrandsAPI :<|> ItemsAPI :<|> CartAPI
+type API = BrandsAPI :<|> ItemsAPI :<|> CartAPI :<|> OrdersAPI
 
 server :: Services IO -> Server API
 server Services {..} =
-  brandsServer brands :<|> itemsServer items :<|> cartServer cart
+  brandsServer brands :<|> itemsServer items :<|>
+  cartServer cart :<|> ordersServer orders
 
 api :: Services IO -> Application
 api s = serve (Proxy :: Proxy API) (server s)

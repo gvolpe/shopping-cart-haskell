@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Services.Orders
   ( Orders(..)
@@ -7,21 +8,20 @@ module Services.Orders
   )
 where
 
-import           Data.Aeson                     ( decode
-                                                , toJSON
-                                                )
+import           Data.Aeson                     ( toJSON )
+import           Data.Aeson.Types               ( Value )
 import           Data.Bifunctor                 ( bimap )
-import qualified Data.ByteString.Lazy          as B
 import           Data.Functor                   ( void )
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as M
 import           Data.Maybe                     ( listToMaybe )
 import           Data.Text                      ( Text )
-import           Data.Text.Encoding             ( encodeUtf8 )
 import           Data.UUID                      ( UUID )
 import qualified Data.UUID                     as UUID
 import qualified Data.UUID.V4                  as UUID
 import           Database.PostgreSQL.Simple
+import           Database.PostgreSQL.Simple.FromField
+import           Database.PostgreSQL.Simple.ToField
 import           Domain.Cart
 import           Domain.Item
 import           Domain.Order
@@ -42,24 +42,27 @@ mkOrders conn = pure $ Orders
   , create = create' conn
   }
 
+instance FromField [CartItem] where
+  fromField = fromJSONField
+
 data OrderDTO = OrderDTO
   { _orderId :: UUID
+  , _orderUserId :: UUID
   , _orderPaymentId :: UUID
-  , _orderItems :: Text
+  , _orderItems :: [CartItem]
   , _orderTotal :: Double
-  } deriving (Generic, FromRow, ToRow, Show)
+  } deriving (Generic, FromRow, Show)
 
 toDomain :: OrderDTO -> Order
 toDomain OrderDTO {..} = Order { orderId        = OrderId _orderId
                                , orderPaymentId = PaymentId _orderPaymentId
-                               , orderItems     = jsonItems _orderItems
+                               , orderItems     = parseItems _orderItems
                                , orderTotal     = Money _orderTotal
                                }
 
-jsonItems :: Text -> Map ItemId Quantity
-jsonItems t = case decode (B.fromStrict $ encodeUtf8 t) of
-  (Just x) -> x
-  Nothing  -> M.fromList []
+parseItems :: [CartItem] -> Map ItemId Quantity
+parseItems xs =
+  M.fromList $ (\i -> (itemId $ cartItem i, cartQuantity i)) <$> xs
 
 selectByUserAndOrderQuery :: Query
 selectByUserAndOrderQuery =
