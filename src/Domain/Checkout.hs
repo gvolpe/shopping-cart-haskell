@@ -1,9 +1,10 @@
-{-# LANGUAGE DataKinds, DeriveGeneric #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 module Domain.Checkout where
 
+import           Control.Monad.Catch          ( Exception)
 import           Data.Aeson
 import           Data.UUID                      ( UUID )
 import           Data.Text                      ( Text )
@@ -11,6 +12,9 @@ import           GHC.Generics                   ( Generic )
 import           Refined
 import           Refined.Instances              ( )
 import           Refined.Orphan.Aeson
+
+data OrderError = OrderError deriving (Exception, Show)
+data PaymentError = PaymentError deriving (Exception, Show)
 
 type CardNamePred = Refined NonEmpty Text
 type CardNumberPred = Refined (SizeEqualTo 16) Int
