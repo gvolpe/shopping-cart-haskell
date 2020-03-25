@@ -101,3 +101,7 @@ If you want to get it done, here's some nice [documentation](https://docs.servan
 #### Configuration
 
 I recommend using [Dhall](https://dhall-lang.org/). You can have a look at how it's done [here](https://github.com/gvolpe/musikell).
+
+#### Tests
+
+The machinery is in place but it's a ton of work to write tests. I'll leave that for another day :)
