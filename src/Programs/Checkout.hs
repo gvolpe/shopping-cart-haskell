@@ -96,9 +96,8 @@ process'
 process' pc sc so uid card = do
   logWith "[Checkout] - Retrieving shopping cart for " uid
   CartTotal {..} <- SC.get sc uid
-  paymentId      <- processPayment' pc (payment cartTotal)
+  paymentId      <- processPayment' pc $ Payment uid cartTotal card
   orderId        <- createOrder' so uid paymentId cartItems cartTotal
   logWith "[Checkout] - Deleting shopping cart for " uid
   void . attempt $ SC.delete sc uid
   pure orderId
-  where payment t = Payment uid t card
