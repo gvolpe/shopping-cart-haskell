@@ -94,14 +94,6 @@ Having an implicit implementation is how we define coherent instances, though, t
 
 There are some features I don't plan to implement due to lack of time and motivation.
 
-#### JWT Authentication
-
-If you want to get it done, here's some nice [documentation](https://docs.servant.dev/en/stable/cookbook/jwt-and-basic-auth/JWTAndBasicAuth.html) on how to get started.
-
-#### Configuration
-
-I recommend using [Dhall](https://dhall-lang.org/). You can have a look at how it's done [here](https://github.com/gvolpe/musikell).
-
-#### Tests
-
-The machinery is in place but it's a ton of work to write tests. I'll leave that for another day :)
+- JWT Authentication: if you want to get it done, here's some nice [documentation](https://docs.servant.dev/en/stable/cookbook/jwt-and-basic-auth/JWTAndBasicAuth.html) on how to get started.
+- Configuration: I recommend using [Dhall](https://dhall-lang.org/). You can have a look at how it's done [here](https://github.com/gvolpe/musikell).
+- Tests: the machinery is in place but it's a ton of work to write tests. I'll leave that for another day :)
