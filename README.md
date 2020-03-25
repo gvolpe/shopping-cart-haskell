@@ -33,7 +33,7 @@ The [original version](https://github.com/gvolpe/pfps-shopping-cart) of the Shop
 - Hedis is used as the default Redis client.
 - PostgreSQL Simple + Raw Strings QQ are used to handle PostgreSQL stuff.
 
-A polymorphic record of functions looks as follow:
+A polymorphic record of functions looks as follows:
 
 ```haskell
 data Brands m = Brands
