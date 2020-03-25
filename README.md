@@ -23,12 +23,10 @@ cabal new-test --test-show-details=streaming
 
 ## Comparison with the Scala application
 
-The [original version](https://github.com/gvolpe/pfps-shopping-cart) of the Shopping Cart has been written in Scala.
-
-The Haskell design is very similar.
+The [original version](https://github.com/gvolpe/pfps-shopping-cart) of the Shopping Cart has been written in [Scala](https://www.scala-lang.org/). The Haskell application's design is quite similar.
 
 - Algebras, here called services, are represented using polymorphic records of functions.
-- Newtypes / Refined: this is the best combination for strongly-typed data.
+- Newtypes / Refined is used for strongly-typed data.
 - Retry is used for retrying computations compositionally.
 - Servant is used as the default HTTP server.
 - Wreq is used as the default HTTP client.
@@ -90,7 +88,7 @@ object Background {
 }
 ```
 
-Having an implicit implementation is how we define coherent instances, though, they can be easily overridden (but this is also possible in Haskell using the right extension).
+Having an implicit implementation is how we define coherent instances, though, they can be easily overridden (but this is also possible in Haskell using the right extensions).
 
 ### Missing features
 
