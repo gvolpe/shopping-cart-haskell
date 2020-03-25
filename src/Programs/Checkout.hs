@@ -53,12 +53,11 @@ processPayment'
   -> Payment
   -> m PaymentId
 processPayment' client payment =
- let
-  action RetryStatus {..} = do
-    logInfo $ "[Checkout] - Processing payment #" <> T.pack (show rsIterNumber)
-    PC.processPayment client payment
- in
-  recoverAll policy action
+  let action RetryStatus {..} = do
+        logInfo $ "[Checkout] - Processing payment #" <> T.pack
+          (show rsIterNumber)
+        PC.processPayment client payment
+  in  recoverAll policy action
 
 createOrder'
   :: forall m
