@@ -22,4 +22,4 @@ class Background m where
 
 instance Background IO where
   schedule fa mins = void $ async (threadDelay (microseconds mins) >> fa)
-    where microseconds Mins {..} = 60000000 * (unrefine unMins)
+    where microseconds Mins {..} = 60000000 * unrefine unMins
