@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Order where
@@ -12,10 +12,13 @@ import           Domain.Cart
 import           Domain.Item
 import           Domain.Payment
 import           GHC.Generics                   ( Generic )
+import           Servant                        ( FromHttpApiData )
 
 newtype OrderId = OrderId {
   unOrderId :: UUID
-} deriving (Eq, Generic, Ord, Show, ToRow)
+} deriving (Eq, FromHttpApiData, Generic, Ord, Show)
+
+instance ToRow OrderId
 
 data Order = Order
   { orderId :: OrderId
