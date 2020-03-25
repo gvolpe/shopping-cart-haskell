@@ -32,8 +32,8 @@ instance ToJSON OrderId where
 
 instance ToJSON Order where
   toJSON Order {..} = object
-    [ "order_id" .= toJSON orderId
-    , "payment_id" .= unPaymentId orderPaymentId
-    , "items" .= toJSON orderItems
-    , "total" .= unMoney orderTotal
+    [ "order_id" .= orderId
+    , "payment_id" .= orderPaymentId
+    , "items" .= orderItems
+    , "total" .= orderTotal
     ]

@@ -4,10 +4,7 @@
 module Domain.Cart where
 
 import           Data.Aeson
-import           Data.Aeson.Types               ( Parser )
-import           Data.Bifunctor                 ( bimap )
 import           Data.Map                       ( Map )
-import qualified Data.Map                      as M
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
@@ -48,21 +45,19 @@ instance FromJSON Quantity where
 
 instance FromJSON Cart where
   parseJSON = withObject "Cart json" $ \o -> do
-    x <- o .: "items" :: Parser (Map UUID Int)
-    return $ Cart (M.fromList $ items x)
-    where items x = bimap ItemId Quantity <$> M.toList x
+    i <- o .: "items"
+    return $ Cart i
 
 instance FromJSON CartItem where
   parseJSON = withObject "CartItem json" $ \o -> do
     i <- o .: "item"
     q <- o .: "quantity"
-    x <- parseJSON i :: Parser Item
-    return $ CartItem x (Quantity q)
+    return $ CartItem i q
 
 instance ToJSON CartItem where
   toJSON CartItem {..} =
-    object ["item" .= cartItem, "quantity" .= unQuantity cartQuantity]
+    object ["item" .= cartItem, "quantity" .= cartQuantity]
 
 instance ToJSON CartTotal where
   toJSON CartTotal {..} =
-    object ["items" .= toJSON cartItems, "total" .= toJSON (unMoney cartTotal)]
+    object ["items" .= cartItems, "total" .= cartTotal]
