@@ -4,8 +4,6 @@
 module Http.Routes.Checkout where
 
 import           Control.Monad.IO.Class         ( liftIO )
-import           Data.Foldable                  ( traverse_ )
-import qualified Data.Map                      as M
 import qualified Data.UUID                     as UUID
 import           Domain.Checkout
 import           Domain.Order

@@ -2,6 +2,7 @@
 
 module Domain.User where
 
+import           Data.Aeson
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple
 import           GHC.Generics                   ( Generic )
@@ -12,3 +13,6 @@ newtype UserId = UserId {
 } deriving (Eq, Generic, Ord, FromHttpApiData, Show)
 
 instance ToRow UserId
+
+instance ToJSON UserId where
+  toJSON i = toJSON $ unUserId i

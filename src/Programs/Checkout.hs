@@ -52,11 +52,12 @@ processPayment'
   => PaymentClient m
   -> Payment
   -> m PaymentId
-processPayment' client payment = recoverAll policy action
- where
-  action RetryStatus {..} = do
-    logInfo $ "[Checkout] - Processing payment #" <> T.pack (show rsIterNumber)
-    PC.processPayment client payment
+processPayment' client payment =
+  let action RetryStatus {..} = do
+        logInfo $ "[Checkout] - Processing payment #" <> T.pack
+          (show rsIterNumber)
+        PC.processPayment client payment
+  in  recoverAll policy action
 
 createOrder'
   :: forall m
@@ -67,16 +68,16 @@ createOrder'
   -> [CartItem]
   -> Money
   -> m OrderId
-createOrder' orders uid pid items total = bgAction $ recoverAll policy action
- where
-  bgAction :: m OrderId -> m OrderId
-  bgAction fa = fa `onError` do
-    logError "[Checkout] - Failed to create order, rescheduling"
-    schedule (bgAction fa) (Mins $$(refineTH 60))
-    throwM OrderError
-  action RetryStatus {..} = do
-    logInfo $ "[Checkout] - Creating order #" <> T.pack (show rsIterNumber)
-    SO.create orders uid pid items total
+createOrder' orders uid pid items total =
+  let bgAction :: m OrderId -> m OrderId
+      bgAction fa = fa `onError` do
+        logError "[Checkout] - Failed to create order, rescheduling"
+        schedule (bgAction fa) (Mins $$(refineTH 60))
+        throwM OrderError
+      action RetryStatus {..} = do
+        logInfo $ "[Checkout] - Creating order #" <> T.pack (show rsIterNumber)
+        SO.create orders uid pid items total
+  in  bgAction $ recoverAll policy action
 
 logWith :: Logger m => T.Text -> UserId -> m ()
 logWith t UserId {..} = logInfo $ t <> UUID.toText unUserId

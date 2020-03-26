@@ -26,9 +26,12 @@ data Payment = Payment
 instance FromJSON PaymentId where
   parseJSON (Object v) = PaymentId <$> v .: "paymentId"
 
+instance ToJSON PaymentId where
+  toJSON i = toJSON $ unPaymentId i
+
 instance ToJSON Payment where
   toJSON Payment {..} = object
-    [ "user_id" .= unUserId paymentUserId
-    , "total" .= unMoney paymentTotal
-    , "card" .= toJSON paymentCard
+    [ "user_id" .= paymentUserId
+    , "total" .= paymentTotal
+    , "card" .= paymentCard
     ]

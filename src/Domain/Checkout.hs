@@ -4,7 +4,7 @@
 
 module Domain.Checkout where
 
-import           Control.Monad.Catch          ( Exception)
+import           Control.Monad.Catch            ( Exception )
 import           Data.Aeson
 import           Data.UUID                      ( UUID )
 import           Data.Text                      ( Text )
@@ -54,8 +54,8 @@ instance FromJSON Card where
 
 instance ToJSON Card where
   toJSON Card {..} = object
-    [ "name" .= unrefine (unCardName cardName)
-    , "number" .= unrefine (unCardNumber cardNumber)
-    , "expiration" .= unrefine (unCardExpiration cardExpiration)
-    , "cvv" .= unrefine (unCardCVV cardCVV)
+    [ "name" .= unCardName cardName
+    , "number" .= unCardNumber cardNumber
+    , "expiration" .= unCardExpiration cardExpiration
+    , "cvv" .= unCardCVV cardCVV
     ]

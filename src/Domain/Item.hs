@@ -13,7 +13,6 @@ module Domain.Item
 where
 
 import           Data.Aeson
-import           Data.Aeson.Types               ( Parser )
 import           Data.Monoid                    ( Sum(..) )
 import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
@@ -60,6 +59,12 @@ instance FromJSON ItemId where
 instance ToJSON ItemId where
   toJSON i = toJSON $ unItemId i
 
+instance FromJSON Money where
+  parseJSON v = Money <$> parseJSON v
+
+instance ToJSON Money where
+  toJSON m = toJSON $ unMoney m
+
 instance FromJSONKey ItemId
 instance ToJSONKey ItemId
 
@@ -71,16 +76,14 @@ instance FromJSON Item where
     p  <- o .: "price"
     b  <- o .: "brand"
     c  <- o .: "category"
-    bp <- parseJSON b :: Parser Brand
-    cp <- parseJSON c :: Parser Category
-    return $ Item (ItemId i) (ItemName n) (ItemDescription d) (Money p) bp cp
+    return $ Item i (ItemName n) (ItemDescription d) p b c
 
 instance ToJSON Item where
   toJSON Item {..} = object
-    [ "uuid" .= unItemId itemId
+    [ "uuid" .= itemId
     , "name" .= unItemName itemName
     , "description" .= unItemDescription itemDescription
-    , "price" .= unMoney itemPrice
-    , "brand" .= toJSON itemBrand
-    , "category" .= toJSON itemCategory
+    , "price" .= itemPrice
+    , "brand" .= itemBrand
+    , "category" .= itemCategory
     ]
