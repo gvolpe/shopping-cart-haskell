@@ -1,4 +1,4 @@
-{ nixpkgs ? import (fetchTarball "https://releases.nixos.org/nixpkgs/nixpkgs-20.09pre214374.1fe82110feb/nixexprs.tar.xz") {} }:
+{ nixpkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs-channels/archive/1fe82110feb.tar.gz") {} }:
 let
   inherit (nixpkgs) pkgs;
   inherit (pkgs) haskellPackages;
