@@ -17,7 +17,7 @@ jobs:
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-store-4
+        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-store-3
     - name: Install dependencies
       run: |
         cabal new-update
