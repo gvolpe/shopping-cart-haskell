@@ -1,9 +1,8 @@
 { mkDerivation, aeson, async, base, bytestring, co-log-core
 , containers, dhall, exceptions, hedgehog, hedis, lens
 , postgresql-simple, raw-strings-qq, refined, retry, servant
-, servant-server, stdenv, template-haskell, text, unliftio
-, unliftio-core, utf8-string, uuid, wai, wai-cors, warp, witherable
-, wreq
+, servant-server, stdenv, template-haskell, text, utf8-string, uuid
+, wai, wai-cors, warp, witherable, wreq
 }:
 mkDerivation {
   pname = "shopping-cart";
@@ -14,8 +13,8 @@ mkDerivation {
   libraryHaskellDepends = [
     aeson async base bytestring co-log-core containers dhall exceptions
     hedis lens postgresql-simple raw-strings-qq refined retry servant
-    servant-server template-haskell text unliftio unliftio-core
-    utf8-string uuid wai wai-cors warp witherable wreq
+    servant-server template-haskell text utf8-string uuid wai wai-cors
+    warp witherable wreq
   ];
   executableHaskellDepends = [ base ];
   testHaskellDepends = [

@@ -2,6 +2,7 @@
 
 module Utils.Redis where
 
+import           Control.Monad.Catch            ( Exception )
 import qualified Data.ByteString.Char8         as C
 import qualified Data.ByteString.Lazy.UTF8     as B
 import qualified Data.ByteString.Lazy          as B
@@ -10,14 +11,13 @@ import qualified Data.UUID                     as UUID
 import qualified Database.Redis                as R
 import           Domain.Item
 import           Text.Read                      ( readMaybe )
+import           Utils.Lift                     ( fromEitherM )
 import           Utils.Text                     ( normalizeBS )
-import           UnliftIO.Exception             ( Exception
-                                                , fromEitherM
-                                                )
 
 instance Exception R.Reply
 
-readInt :: forall n a . (Integral n, Read n) => (n -> a) -> C.ByteString -> Maybe a
+readInt
+  :: forall n a . (Integral n, Read n) => (n -> a) -> C.ByteString -> Maybe a
 readInt f x = f <$> (readMaybe . B.toString $ B.fromStrict x)
 
 readUUID :: (UUID -> a) -> C.ByteString -> Maybe a

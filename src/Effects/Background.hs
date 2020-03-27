@@ -2,12 +2,12 @@
 
 module Effects.Background where
 
-import           Data.Functor                   ( void )
-import           Refined
-import           UnliftIO.Async                 ( async )
-import           UnliftIO.Concurrent            ( forkIO
+import           Control.Concurrent.Async       ( async )
+import           Control.Concurrent             ( forkIO
                                                 , threadDelay
                                                 )
+import           Data.Functor                   ( void )
+import           Refined
 
 newtype Minutes = Mins {
   unMins :: Refined Positive Int
