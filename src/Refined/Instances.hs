@@ -6,7 +6,6 @@ import           Control.Monad                  ( when )
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
 import           Data.Typeable                  ( typeOf )
-import           Language.Haskell.TH.Syntax     ( Lift(..) )
 import           Refined
 import           GHC.TypeNats                   ( KnownNat )
 
@@ -19,7 +18,3 @@ instance KnownNat n => Predicate (SizeEqualTo n) Int where
     digits :: Integral x => x -> [x]
     digits 0 = []
     digits x = digits (x `div` 10) ++ [x `mod` 10]
-
--- Or use: https://hackage.haskell.org/package/th-lift-instances
-instance Lift Text where
-  lift = lift . T.unpack
