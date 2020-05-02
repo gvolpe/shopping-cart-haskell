@@ -18,7 +18,7 @@ cabal new-run shopping-cart
 #### Run tests
 
 ```
-cabal new-test --test-show-details=streaming
+cabal new-run shopping-cart-tests
 ```
 
 ## Comparison with the Scala application

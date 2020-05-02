@@ -1,10 +1,8 @@
-cabal-version:       >=1.10
+cabal-version:       2.4
 
 name:                shopping-cart
 version:             0.1.0.0
-synopsis:            The Shopping Cart developed in PFP Scala for Haskell
--- description:
--- bug-reports:
+synopsis:            The Haskell version of the original Shopping Cart developed in the Practical FP in Scala book
 license:             Apache-2.0
 license-file:        LICENSE
 author:              Gabriel Volpe
@@ -56,6 +54,7 @@ library
                      , hedis
                      , lens
                      , postgresql-simple
+                     , prettyprinter
                      , raw-strings-qq
                      , refined
                      , retry

@@ -1,25 +1,42 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances, KindSignatures, MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 module Domain.Checkout where
 
+import           Control.Monad                  ( unless )
 import           Control.Monad.Catch            ( Exception )
 import           Data.Aeson
-import           Data.UUID                      ( UUID )
 import           Data.Text                      ( Text )
+import qualified Data.Text.Prettyprint.Doc     as PP
+import           Data.Typeable                  ( typeOf )
+import           Data.UUID                      ( UUID )
 import           GHC.Generics                   ( Generic )
+import           GHC.TypeLits                   ( KnownNat
+                                                , Nat
+                                                , natVal
+                                                )
 import           Refined
 import           Refined.Instances              ( )
 import           Refined.Orphan.Aeson
 
+
 data OrderError = OrderError deriving (Exception, Show)
 data PaymentError = PaymentError deriving (Exception, Show)
 
+data HasDigits (nat :: Nat) = HasDigits
+
+instance (KnownNat n, Integral x, Show x) => Predicate (HasDigits n) x where
+  validate p value =
+    unless (natVal p == toInteger (length $ show value))
+      $  throwRefineOtherException (typeOf p)
+      $  "Invalid number of digits. Expected "
+      <> PP.pretty (natVal p)
+
 type CardNamePred = Refined NonEmpty Text
-type CardNumberPred = Refined (SizeEqualTo 16) Int
-type CardExpirationPred = Refined (SizeEqualTo 4) Int
-type CardCVVPred = Refined (SizeEqualTo 3) Int
+type CardNumberPred = Refined (HasDigits 16) Int
+type CardExpirationPred = Refined (HasDigits 4) Int
+type CardCVVPred = Refined (HasDigits 3) Int
 
 newtype CardName = CardName {
   unCardName :: CardNamePred
