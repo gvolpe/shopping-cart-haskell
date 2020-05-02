@@ -8,11 +8,9 @@ import           Database.PostgreSQL.Simple
 import           GHC.Generics                   ( Generic )
 import           Servant                        ( FromHttpApiData )
 
-newtype UserId = UserId {
- unUserId :: UUID
-} deriving (Eq, Generic, Ord, FromHttpApiData, Show)
+newtype UserId = UserId UUID deriving (Eq, Generic, Ord, FromHttpApiData, Show)
 
 instance ToRow UserId
 
 instance ToJSON UserId where
-  toJSON i = toJSON $ unUserId i
+  toJSON (UserId i) = toJSON i

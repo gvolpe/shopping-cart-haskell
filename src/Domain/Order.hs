@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 
 module Domain.Order where
 
@@ -14,9 +13,7 @@ import           Domain.Payment
 import           GHC.Generics                   ( Generic )
 import           Servant                        ( FromHttpApiData )
 
-newtype OrderId = OrderId {
-  unOrderId :: UUID
-} deriving (Eq, FromHttpApiData, Generic, Ord, Show)
+newtype OrderId = OrderId UUID deriving (Eq, FromHttpApiData, Generic, Ord, Show)
 
 instance ToRow OrderId
 
@@ -28,12 +25,12 @@ data Order = Order
   } deriving (Generic, Show)
 
 instance ToJSON OrderId where
-  toJSON i = toJSON $ unOrderId i
+  toJSON (OrderId i) = toJSON i
 
 instance ToJSON Order where
-  toJSON Order {..} = object
+  toJSON (Order orderId paymentId items total) = object
     [ "order_id" .= orderId
-    , "payment_id" .= orderPaymentId
-    , "items" .= orderItems
-    , "total" .= orderTotal
+    , "payment_id" .= paymentId
+    , "items" .= items
+    , "total" .= total
     ]

@@ -23,6 +23,6 @@ checkoutServer :: Checkout IO -> Server CheckoutAPI
 checkoutServer = checkout'
 
 checkout' :: Checkout IO -> UserId -> Card -> Handler OrderId
-checkout' s uid@UserId {..} card = do
-  logInfo $ "[Checkout] - Processing order for UserId: " <> UUID.toText unUserId
-  liftIO $ PC.process s uid card
+checkout' s u@(UserId uid) card = do
+  logInfo $ "[Checkout] - Processing order for UserId: " <> UUID.toText uid
+  liftIO $ PC.process s u card

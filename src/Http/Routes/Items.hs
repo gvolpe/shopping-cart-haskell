@@ -1,5 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
 
 module Http.Routes.Items where
 
@@ -21,9 +20,9 @@ itemsServer = findItems
 
 findItems :: Items IO -> Maybe BrandNameParam -> Handler [Item]
 findItems i (Just bn) = do
-  logInfo $ "[Items] - Find by brand: " <> unBrandName brand
+  logInfo $ "[Items] - Find by brand: " <> b
   liftIO $ SI.findBy i brand
-  where brand = toBrandName bn
+  where brand@(BrandName b) = toBrandName bn
 findItems i Nothing = do
   logInfo "[Items] - Find all"
   liftIO $ SI.findAll i

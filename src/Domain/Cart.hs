@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
 
 module Domain.Cart where
 
@@ -11,13 +10,10 @@ import           Database.PostgreSQL.Simple.ToRow
 import           Domain.Item
 import           GHC.Generics                   ( Generic )
 
-newtype CartId = CartId {
-  unCartId :: UUID
-} deriving (Generic, ToRow, Show)
-
-newtype Cart = Cart {
-  unCart :: Map ItemId Quantity
-} deriving (Generic, Show)
+newtype CartId = CartId UUID deriving (Generic, ToRow, Show)
+newtype Cart = Cart (Map ItemId Quantity) deriving (Generic, Show)
+newtype Quantity = Quantity Int deriving (Generic, ToRow, Show)
+newtype CartExpiration = CartExpiration Integer deriving (Generic, ToRow, Show)
 
 data CartItem = CartItem
   { cartItem :: Item
@@ -29,16 +25,8 @@ data CartTotal = CartTotal
   , cartTotal :: Money
   } deriving (Generic, Show)
 
-newtype Quantity = Quantity {
-  unQuantity :: Int
-} deriving (Generic, ToRow, Show)
-
-newtype CartExpiration = CartExpiration {
-  unCartExpiration :: Integer
-} deriving (Generic, ToRow, Show)
-
 instance ToJSON Quantity where
-  toJSON q = toJSON (unQuantity q)
+  toJSON (Quantity q) = toJSON q
 
 instance FromJSON Quantity where
   parseJSON v = Quantity <$> parseJSON v
@@ -55,9 +43,9 @@ instance FromJSON CartItem where
     return $ CartItem i q
 
 instance ToJSON CartItem where
-  toJSON CartItem {..} =
-    object ["item" .= cartItem, "quantity" .= cartQuantity]
+  toJSON (CartItem item quantity) =
+    object ["item" .= item, "quantity" .= quantity]
 
 instance ToJSON CartTotal where
-  toJSON CartTotal {..} =
-    object ["items" .= cartItems, "total" .= cartTotal]
+  toJSON (CartTotal items total) =
+    object ["items" .= items, "total" .= total]

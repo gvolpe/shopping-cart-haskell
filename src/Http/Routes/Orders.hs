@@ -1,5 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
 
 module Http.Routes.Orders where
 
@@ -23,11 +22,11 @@ ordersServer :: Orders IO -> Server OrdersAPI
 ordersServer s = findAllOrdersBy s :<|> findOrderBy s
 
 findAllOrdersBy :: Orders IO -> UserId -> Handler [Order]
-findAllOrdersBy s uid@UserId {..} = do
-  logInfo $ "[Orders] - Find all by UserId: " <> UUID.toText unUserId
-  liftIO $ SO.findBy s uid
+findAllOrdersBy s u@(UserId uid) = do
+  logInfo $ "[Orders] - Find all by UserId: " <> UUID.toText uid
+  liftIO $ SO.findBy s u
 
 findOrderBy :: Orders IO -> UserId -> OrderId -> Handler (Maybe Order)
-findOrderBy s uid@UserId {..} oid = do
-  logInfo $ "[Orders] - Find order for UserId: " <> UUID.toText unUserId
-  liftIO $ SO.get s uid oid
+findOrderBy s u@(UserId uid) oid = do
+  logInfo $ "[Orders] - Find order for UserId: " <> UUID.toText uid
+  liftIO $ SO.get s u oid

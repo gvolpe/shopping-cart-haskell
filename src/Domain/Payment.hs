@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, RecordWildCards #-}
-{-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, OverloadedStrings, ScopedTypeVariables #-}
 
 module Domain.Payment where
 
@@ -13,9 +12,7 @@ import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
 import           GHC.Generics                   ( Generic )
 
-newtype PaymentId = PaymentId {
-  unPaymentId :: UUID
-} deriving (Eq, Generic, ToRow, Show)
+newtype PaymentId = PaymentId UUID deriving (Eq, Generic, ToRow, Show)
 
 data Payment = Payment
   { paymentUserId :: UserId
@@ -27,11 +24,11 @@ instance FromJSON PaymentId where
   parseJSON (Object v) = PaymentId <$> v .: "paymentId"
 
 instance ToJSON PaymentId where
-  toJSON i = toJSON $ unPaymentId i
+  toJSON (PaymentId i) = toJSON i
 
 instance ToJSON Payment where
-  toJSON Payment {..} = object
-    [ "user_id" .= paymentUserId
-    , "total" .= paymentTotal
-    , "card" .= paymentCard
+  toJSON (Payment uid total card) = object
+    [ "user_id" .= uid
+    , "total" .= total
+    , "card" .= card
     ]

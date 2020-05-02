@@ -40,23 +40,23 @@ mkShoppingCart c i exp = pure $ ShoppingCart { add        = add' c exp
                                              }
 
 add' :: Connection -> CartExpiration -> UserId -> ItemId -> Quantity -> IO ()
-add' conn CartExpiration {..} u i q = R.runRedis conn $ do
+add' conn (CartExpiration exp) (UserId uid) (ItemId i) (Quantity q) = R.runRedis conn $ do
   R.hset k f v
-  void $ R.expire k unCartExpiration
+  void $ R.expire k exp
  where
-  k = C.pack . UUID.toString $ unUserId u
-  f = C.pack . UUID.toString $ unItemId i
-  v = C.pack . show $ unQuantity q
+  k = C.pack $ UUID.toString uid
+  f = C.pack $ UUID.toString i
+  v = C.pack $ show q
 
 calcTotal :: [CartItem] -> Money
 calcTotal = foldMap
-  (\CartItem {..} ->
-    itemPrice cartItem * (Money . fromIntegral $ unQuantity cartQuantity)
+  (\(CartItem cartItem (Quantity q)) ->
+    itemPrice cartItem * (Money $ fromIntegral q)
   )
 
 get' :: Connection -> Items IO -> UserId -> IO CartTotal
-get' conn items UserId {..} = do
-  res <- R.runRedisM conn $ R.hgetall (R.writeUUID unUserId)
+get' conn items (UserId uid) = do
+  res <- R.runRedisM conn $ R.hgetall (R.writeUUID uid)
   its <- wither
     (\(k, v) -> do
       it <- liftMaybe $ R.readUUID ItemId k
@@ -67,14 +67,14 @@ get' conn items UserId {..} = do
   pure (CartTotal its $ calcTotal its)
 
 delete' :: Connection -> UserId -> IO ()
-delete' conn u =
-  R.runRedis conn . void $ R.del [C.pack . UUID.toString $ unUserId u]
+delete' conn (UserId uid) =
+  R.runRedis conn . void $ R.del [C.pack $ UUID.toString uid]
 
 removeItem' :: Connection -> UserId -> ItemId -> IO ()
-removeItem' conn u i = R.runRedis conn . void $ R.hdel k [f]
+removeItem' conn (UserId uid) (ItemId i) = R.runRedis conn . void $ R.hdel k [f]
  where
-  k = C.pack . UUID.toString $ unUserId u
-  f = C.pack . UUID.toString $ unItemId i
+  k = C.pack $ UUID.toString uid
+  f = C.pack $ UUID.toString i
 
 -- TODO: implement
 update' :: Connection -> CartExpiration -> UserId -> Cart -> IO ()

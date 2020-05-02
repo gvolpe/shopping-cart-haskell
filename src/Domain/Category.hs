@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
 
 module Domain.Category
   ( CategoryId(..)
@@ -17,13 +16,8 @@ import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
 import           GHC.Generics                   ( Generic )
 
-newtype CategoryId = CategoryId {
-  unCategoryId :: UUID
-} deriving (Generic, ToRow, Show)
-
-newtype CategoryName = CategoryName {
-  unCategoryName :: Text
-} deriving (Generic, ToRow, Show)
+newtype CategoryId = CategoryId UUID deriving (Generic, ToRow, Show)
+newtype CategoryName = CategoryName Text deriving (Generic, ToRow, Show)
 
 data Category = Category
   { categoryId :: CategoryId
@@ -37,5 +31,5 @@ instance FromJSON Category where
     return $ Category (CategoryId i) (CategoryName n)
 
 instance ToJSON Category where
-  toJSON Category {..} = object
-    ["uuid" .= unCategoryId categoryId, "name" .= unCategoryName categoryName]
+  toJSON (Category (CategoryId cid) (CategoryName cname)) = object
+    ["uuid" .= cid, "name" .= cname]

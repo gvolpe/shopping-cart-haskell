@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 module Services.Orders
   ( Orders(..)
@@ -69,17 +68,17 @@ selectByUserAndOrderQuery =
   "SELECT * FROM orders WHERE user_id = ? AND uuid = ?"
 
 get' :: Connection -> UserId -> OrderId -> IO (Maybe OrderDTO)
-get' conn UserId {..} OrderId {..} =
-  listToMaybe <$> query conn selectByUserAndOrderQuery [unUserId, unOrderId]
+get' conn (UserId uid) (OrderId oid) =
+  listToMaybe <$> query conn selectByUserAndOrderQuery [uid, oid]
 
 findBy' :: Connection -> UserId -> IO [OrderDTO]
 findBy' = flip query "SELECT * FROM orders WHERE user_id = ?"
 
 create'
   :: Connection -> UserId -> PaymentId -> [CartItem] -> Money -> IO OrderId
-create' conn UserId {..} PaymentId {..} its Money {..} = do
+create' conn (UserId uid) (PaymentId pid) its (Money money) = do
   oid <- OrderId <$> UUID.nextRandom
   executeMany conn "INSERT INTO orders VALUES (?, ?, ?, ?, ?)" (values oid)
   pure oid
  where
-  values oid = [(unOrderId oid, unUserId, unPaymentId, toJSON its, unMoney)]
+  values (OrderId oid) = [(oid, uid, pid, toJSON its, money)]

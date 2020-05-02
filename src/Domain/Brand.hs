@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
 
 module Domain.Brand
   ( BrandId(..)
@@ -15,13 +14,8 @@ import           Database.PostgreSQL.Simple.ToRow
                                                 ( ToRow )
 import           GHC.Generics                   ( Generic )
 
-newtype BrandId = BrandId {
-  unBrandId :: UUID
-} deriving (Generic, ToRow, Show)
-
-newtype BrandName = BrandName {
-  unBrandName :: Text
-} deriving (Generic, ToRow, Show)
+newtype BrandId = BrandId UUID deriving (Generic, ToRow, Show)
+newtype BrandName = BrandName Text deriving (Generic, ToRow, Show)
 
 data Brand = Brand
   { brandId :: BrandId
@@ -35,5 +29,5 @@ instance FromJSON Brand where
     return $ Brand (BrandId i) (BrandName n)
 
 instance ToJSON Brand where
-  toJSON Brand {..} =
-    object ["uuid" .= unBrandId brandId, "name" .= unBrandName brandName]
+  toJSON (Brand (BrandId bid) (BrandName bname)) =
+    object ["uuid" .= bid, "name" .= bname]

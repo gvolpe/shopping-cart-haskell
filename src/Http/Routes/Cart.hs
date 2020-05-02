@@ -26,16 +26,16 @@ cartServer :: ShoppingCart IO -> Server CartAPI
 cartServer s = findCartBy s :<|> addToCart s :<|> deleteCartBy s
 
 findCartBy :: ShoppingCart IO -> UserId -> Handler CartTotal
-findCartBy s uid@UserId {..} = do
-  logInfo $ "[Shopping Cart] - Find by UserId: " <> UUID.toText unUserId
-  liftIO $ SC.get s uid
+findCartBy s u@(UserId uid) = do
+  logInfo $ "[Shopping Cart] - Find by UserId: " <> UUID.toText uid
+  liftIO $ SC.get s u
 
 addToCart :: ShoppingCart IO -> UserId -> Cart -> Handler ()
-addToCart s uid@UserId {..} Cart {..} = do
-  logInfo $ "[Shopping Cart] - Add items for UserId: " <> UUID.toText unUserId
-  liftIO $ traverse_ (uncurry $ SC.add s uid) (M.toList unCart)
+addToCart s u@(UserId uid) (Cart cart) = do
+  logInfo $ "[Shopping Cart] - Add items for UserId: " <> UUID.toText uid
+  liftIO $ traverse_ (uncurry $ SC.add s u) (M.toList cart)
 
 deleteCartBy :: ShoppingCart IO -> UserId -> Handler ()
-deleteCartBy s uid@UserId {..} = do
-  logInfo $ "[Shopping Cart] - Delete Cart by UserId: " <> UUID.toText unUserId
-  liftIO $ SC.delete s uid
+deleteCartBy s u@(UserId uid) = do
+  logInfo $ "[Shopping Cart] - Delete Cart by UserId: " <> UUID.toText uid
+  liftIO $ SC.delete s u

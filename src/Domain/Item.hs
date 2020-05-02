@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingVia #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingVia, OverloadedStrings #-}
 
 module Domain.Item
   ( ItemId(..)
@@ -22,21 +21,12 @@ import           Domain.Category
 import           GHC.Generics                   ( Generic )
 import           GHC.Real                       ( Ratio )
 
-newtype ItemId = ItemId {
- unItemId :: UUID
-} deriving (Eq, Generic, Ord, Show, ToRow)
+newtype ItemId = ItemId UUID deriving (Eq, Generic, Ord, Show, ToRow)
+newtype ItemName = ItemName Text deriving (Generic, ToRow, Show)
+newtype ItemDescription = ItemDescription Text deriving (Generic, ToRow, Show)
 
-newtype ItemName = ItemName {
- unItemName :: Text
-} deriving (Generic, ToRow, Show)
-
-newtype ItemDescription = ItemDescription {
- unItemDescription :: Text
-} deriving (Generic, ToRow, Show)
-
-newtype Money = Money {
- unMoney :: Double
-} deriving stock (Generic, Show)
+newtype Money = Money Double
+  deriving stock (Generic, Show)
   deriving Num via (Sum Double)
   deriving Semigroup via (Sum Double)
   deriving Monoid via (Sum Double)
@@ -57,13 +47,13 @@ instance FromJSON ItemId where
   parseJSON v = ItemId <$> parseJSON v
 
 instance ToJSON ItemId where
-  toJSON i = toJSON $ unItemId i
+  toJSON (ItemId i) = toJSON i
 
 instance FromJSON Money where
   parseJSON v = Money <$> parseJSON v
 
 instance ToJSON Money where
-  toJSON m = toJSON $ unMoney m
+  toJSON (Money m) = toJSON m
 
 instance FromJSONKey ItemId
 instance ToJSONKey ItemId
@@ -79,11 +69,11 @@ instance FromJSON Item where
     return $ Item i (ItemName n) (ItemDescription d) p b c
 
 instance ToJSON Item where
-  toJSON Item {..} = object
-    [ "uuid" .= itemId
-    , "name" .= unItemName itemName
-    , "description" .= unItemDescription itemDescription
-    , "price" .= itemPrice
-    , "brand" .= itemBrand
-    , "category" .= itemCategory
+  toJSON (Item (ItemId iid) (ItemName name) (ItemDescription desc) price brand category) = object
+    [ "uuid" .= iid
+    , "name" .= name
+    , "description" .= desc
+    , "price" .= price
+    , "brand" .= brand
+    , "category" .= category
     ]

@@ -1,6 +1,5 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances, KindSignatures, MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 
 module Domain.Checkout where
 
@@ -38,21 +37,10 @@ type CardNumberPred = Refined (HasDigits 16) Int
 type CardExpirationPred = Refined (HasDigits 4) Int
 type CardCVVPred = Refined (HasDigits 3) Int
 
-newtype CardName = CardName {
-  unCardName :: CardNamePred
-} deriving (Generic, Show)
-
-newtype CardNumber = CardNumber {
-  unCardNumber :: CardNumberPred
-} deriving (Generic, Show)
-
-newtype CardExpiration = CardExpiration {
-  unCardExpiration :: CardExpirationPred
-} deriving (Generic, Show)
-
-newtype CardCVV = CardCVV {
-  unCardCVV :: CardCVVPred
-} deriving (Generic, Show)
+newtype CardName = CardName CardNamePred deriving (Generic, Show)
+newtype CardNumber = CardNumber CardNumberPred deriving (Generic, Show)
+newtype CardExpiration = CardExpiration CardExpirationPred deriving (Generic, Show)
+newtype CardCVV = CardCVV CardCVVPred deriving (Generic, Show)
 
 data Card = Card
   { cardName :: CardName
@@ -70,9 +58,6 @@ instance FromJSON Card where
     return $ Card (CardName n) (CardNumber r) (CardExpiration e) (CardCVV c)
 
 instance ToJSON Card where
-  toJSON Card {..} = object
-    [ "name" .= unCardName cardName
-    , "number" .= unCardNumber cardNumber
-    , "expiration" .= unCardExpiration cardExpiration
-    , "cvv" .= unCardCVV cardCVV
-    ]
+  toJSON (Card (CardName name) (CardNumber number) (CardExpiration exp) (CardCVV cvv))
+    = object
+      ["name" .= name, "number" .= number, "expiration" .= exp, "cvv" .= cvv]

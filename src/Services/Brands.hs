@@ -37,8 +37,8 @@ findAll' :: Connection -> IO [BrandDTO]
 findAll' = flip query_ "SELECT * FROM brands"
 
 create' :: Connection -> BrandName -> IO ()
-create' c BrandName {..} = do
+create' c (BrandName bname) = do
   uuid <- nextRandom
   void $ executeMany c
                      "INSERT INTO brands (uuid, name) VALUES (?, ?)"
-                     [(uuid, unBrandName)]
+                     [(uuid, bname)]

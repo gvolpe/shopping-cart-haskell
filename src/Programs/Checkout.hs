@@ -80,7 +80,7 @@ createOrder' orders uid pid items total =
   in  bgAction $ recoverAll policy action
 
 logWith :: Logger m => T.Text -> UserId -> m ()
-logWith t UserId {..} = logInfo $ t <> UUID.toText unUserId
+logWith t (UserId uid) = logInfo $ t <> UUID.toText uid
 
 attempt :: forall m a . MonadMask m => m a -> m (Either SomeException a)
 attempt = try

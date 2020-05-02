@@ -14,11 +14,10 @@ import           Servant.API
 import           Utils.Text                     ( normalize )
 
 toBrandName :: BrandNameParam -> BrandName
-toBrandName = BrandName . normalize . unrefine . unBrandNameParam
+toBrandName (BrandNameParam p) = BrandName . normalize $ unrefine p
 
 instance FromHttpApiData (Refined NonEmpty Text) where
   parseUrlPiece = first (T.pack . show) . refine
 
-newtype BrandNameParam = BrandNameParam
-  { unBrandNameParam :: Refined NonEmpty Text
-  } deriving (FromHttpApiData, Show)
+newtype BrandNameParam = BrandNameParam (Refined NonEmpty Text)
+  deriving (FromHttpApiData, Show)
