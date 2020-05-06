@@ -3,8 +3,10 @@
 
 module Domain.Checkout where
 
+import           Control.Arrow                  ( left )
 import           Control.Monad                  ( unless )
 import           Control.Monad.Catch            ( Exception )
+import           Control.ParDual.Class
 import           Data.Aeson
 import           Data.Text                      ( Text )
 import qualified Data.Text.Prettyprint.Doc     as PP
@@ -17,7 +19,6 @@ import           GHC.TypeLits                   ( KnownNat
                                                 )
 import           Refined
 import           Refined.Instances              ( )
-import           Refined.Orphan.Aeson
 
 
 data OrderError = OrderError deriving (Exception, Show)
@@ -49,13 +50,31 @@ data Card = Card
   , cardCVV :: CardCVV
   } deriving (Generic, Show)
 
+-- TODO: This can be moved to a different module if needed (e.g. Utils)
+ref :: Predicate p x => x -> String -> Either [String] (Refined p x)
+ref x tag = left (\e -> [tag <> ": " <> show e]) (refine x)
+
+validateCard :: Text -> Int -> Int -> Int -> Either [String] Card
+validateCard n r e c = parMap4 (CardName <$> ref n "name")
+                               (CardNumber <$> ref r "number")
+                               (CardExpiration <$> ref e "expiration")
+                               (CardCVV <$> ref c "cvv")
+                               Card
+
 instance FromJSON Card where
+  -- This needs to return a Parser Card and there is not much we can do with it
   parseJSON = withObject "Card json" $ \o -> do
     n <- o .: "name"
     r <- o .: "number"
     e <- o .: "expiration"
     c <- o .: "cvv"
-    return $ Card (CardName n) (CardNumber r) (CardExpiration e) (CardCVV c)
+    case validateCard n r e c of
+      Left  err  -> fail $ show err
+      Right card -> return card
+
+-- Also defined in Refined.Orphan.Aeson
+instance (ToJSON a, Predicate p a) => ToJSON (Refined p a) where
+  toJSON = toJSON . unrefine
 
 instance ToJSON Card where
   toJSON (Card (CardName name) (CardNumber number) (CardExpiration exp) (CardCVV cvv))
