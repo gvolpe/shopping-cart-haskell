@@ -3,9 +3,12 @@
 
 module Domain.Checkout where
 
+import           Control.Arrow                  ( left )
 import           Control.Monad                  ( unless )
 import           Control.Monad.Catch            ( Exception )
+import           Control.ParDual.Class
 import           Data.Aeson
+import           Data.Aeson.Types               ( Parser )
 import           Data.Text                      ( Text )
 import qualified Data.Text.Prettyprint.Doc     as PP
 import           Data.Typeable                  ( typeOf )
@@ -17,7 +20,6 @@ import           GHC.TypeLits                   ( KnownNat
                                                 )
 import           Refined
 import           Refined.Instances              ( )
-import           Refined.Orphan.Aeson
 
 
 data OrderError = OrderError deriving (Exception, Show)
@@ -49,13 +51,32 @@ data Card = Card
   , cardCVV :: CardCVV
   } deriving (Generic, Show)
 
+-- TODO: This can be moved to a different module if needed (e.g. Utils)
+ref :: Predicate p x => x -> Either [String] (Refined p x)
+ref x = left (\e -> [show e]) (refine x)
+
+validateCard :: Text -> Int -> Int -> Int -> Either [String] Card
+validateCard n r e c = parMap4 (CardName <$> ref n)
+                               (CardNumber <$> ref r)
+                               (CardExpiration <$> ref e)
+                               (CardCVV <$> ref c)
+                               Card
+
 instance FromJSON Card where
   parseJSON = withObject "Card json" $ \o -> do
-    n <- o .: "name"
-    r <- o .: "number"
-    e <- o .: "expiration"
-    c <- o .: "cvv"
-    return $ Card (CardName n) (CardNumber r) (CardExpiration e) (CardCVV c)
+    n <- o .: "name" :: Parser Text
+    r <- o .: "number" :: Parser Int
+    e <- o .: "expiration" :: Parser Int
+    c <- o .: "cvv" :: Parser Int
+    case validateCard n r e c of
+      Left  err  -> fail (show err)
+      Right card -> return card
+    --return $ Card (CardName n) (CardNumber r) (CardExpiration e) (CardCVV c)
+
+-- Also defined in Refined.Orphan.Aeson
+-- the generic FromJSON for refinement types validates sequentially
+instance (ToJSON a, Predicate p a) => ToJSON (Refined p a) where
+  toJSON = toJSON . unrefine
 
 instance ToJSON Card where
   toJSON (Card (CardName name) (CardNumber number) (CardExpiration exp) (CardCVV cvv))
