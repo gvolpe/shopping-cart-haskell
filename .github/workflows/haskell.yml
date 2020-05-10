@@ -13,8 +13,9 @@ jobs:
         ghc: ["8.8.3", "8.10.1"]
         cabal: ["3.2"]
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-haskell@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-haskell@v1.1
+      id: setup-haskell-cabal
       with:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
