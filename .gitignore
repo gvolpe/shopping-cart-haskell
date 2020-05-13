@@ -4,3 +4,4 @@ cabal.project.local
 dist-newstyle/
 dist/
 .ghc.*
+.direnv
