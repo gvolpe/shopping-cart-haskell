@@ -1,35 +1,17 @@
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: "actions/checkout@v2.1.0"
+      - uses: "cachix/install-nix-action@v9"
+      - uses: "cachix/cachix-action@v6"
+        with:
+          name: shopping-cart
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+      - run: "nix-shell --run \"cabal new-test --test-show-details=streaming\""
 name: Haskell CI
-
 on:
   pull_request:
   push:
-    branches: [master]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ghc: ["8.8.3"]
-        cabal: ["3.2"]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-haskell@v1.1
-      id: setup-haskell-cabal
-      with:
-        ghc-version: ${{ matrix.ghc }}
-        cabal-version: ${{ matrix.cabal }}
-    - uses: actions/cache@v1
-      name: Cache cabal-store
-      with:
-        path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal
-    - name: Install dependencies
-      run: |
-        cabal new-update
-        cabal new-configure --write-ghc-environment-files=always -j2
-        cabal new-build --only-dependencies
-    - name: Build & Run Tests
-      run: |
-        cabal new-build
-        cabal new-test --test-show-details=streaming
+    branches:
+      - master
