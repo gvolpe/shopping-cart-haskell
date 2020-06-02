@@ -8,7 +8,7 @@ jobs:
         with:
           name: shopping-cart
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
-      - run: "nix-shell run -- \"cabal new-test --test-show-details=streaming\""
+      - run: "nix-shell run -- \"cabal new-build && cabal new-test\""
 name: Haskell CI
 on:
   pull_request:
