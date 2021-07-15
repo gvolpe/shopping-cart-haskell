@@ -33,6 +33,7 @@ library
                      , Http.Routes.Version
                      , Http.Server
                      , Programs.Checkout
+                     , Refined.Helper
                      , Refined.Instances
                      , Resources
                      , Services
