@@ -1,37 +1,41 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances, KindSignatures, MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables, TypeApplications #-}
 
 module Domain.Checkout where
 
-import           Control.Arrow                  ( left )
 import           Control.Monad                  ( unless )
 import           Control.Monad.Catch            ( Exception )
 import           Control.ParDual.Class
 import           Data.Aeson
 import           Data.Text                      ( Text )
-import qualified Data.Text.Prettyprint.Doc     as PP
 import           Data.Typeable                  ( typeOf )
 import           Data.UUID                      ( UUID )
 import           GHC.Generics                   ( Generic )
 import           GHC.TypeLits                   ( KnownNat
                                                 , Nat
-                                                , natVal
+                                                , natVal'
                                                 )
 import           Refined
+import           Refined.Helper                 ( i2text
+                                                , nv
+                                                , ref
+                                                )
 import           Refined.Instances              ( )
-
 
 data OrderError = OrderError deriving (Exception, Show)
 data PaymentError = PaymentError deriving (Exception, Show)
 
-data HasDigits (nat :: Nat) = HasDigits
+data HasDigits (n :: Nat) = HasDigits deriving Generic
 
-instance (KnownNat n, Integral x, Show x) => Predicate (HasDigits n) x where
-  validate p value =
-    unless (natVal p == toInteger (length $ show value))
-      $  throwRefineOtherException (typeOf p)
-      $  "Invalid number of digits. Expected "
-      <> PP.pretty (natVal p)
+instance (Integral x, Show x, KnownNat n) => Predicate (HasDigits n) x where
+  validate p x = do
+    let n = fromIntegral (nv @n)
+    if n == toInteger (length $ show x)
+      then Nothing
+      else throwRefineOtherException
+        (typeOf p)
+        ("Invalid number of digits. Expected " <> i2text n)
 
 type CardNamePred = Refined NonEmpty Text
 type CardNumberPred = Refined (HasDigits 16) Int
@@ -50,10 +54,6 @@ data Card = Card
   , cardCVV :: CardCVV
   } deriving (Generic, Show)
 
--- TODO: This can be moved to a different module if needed (e.g. Utils)
-ref :: Predicate p x => x -> String -> Either [String] (Refined p x)
-ref x tag = left (\e -> [tag <> ": " <> show e]) (refine x)
-
 validateCard :: Text -> Int -> Int -> Int -> Either [String] Card
 validateCard n r e c = parMap4 (CardName <$> ref n "name")
                                (CardNumber <$> ref r "number")
@@ -71,10 +71,6 @@ instance FromJSON Card where
     case validateCard n r e c of
       Left  err  -> fail $ show err
       Right card -> return card
-
--- Also defined in Refined.Orphan.Aeson
-instance (ToJSON a, Predicate p a) => ToJSON (Refined p a) where
-  toJSON = toJSON . unrefine
 
 instance ToJSON Card where
   toJSON (Card (CardName name) (CardNumber number) (CardExpiration exp) (CardCVV cvv))

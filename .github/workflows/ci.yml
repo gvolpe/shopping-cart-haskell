@@ -1,0 +1,24 @@
+name: Haskell CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2.3.2
+
+      - name: "Install Nix ❄️"
+        uses: cachix/install-nix-action@v12
+
+      - name: "Install Cachix ❄️"
+        uses: cachix/cachix-action@v8
+        with:
+          name: shopping-cart
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+
+      - run: nix-shell --run "nix-build-uncached default.nix" nix/ci.nix
