@@ -1,1 +1,8 @@
-cradle: {cabal: {component: "lib:shopping-cart"}}
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:shopping-cart"
+    - path: "./app"
+      component: "exe:shopping-cart"
+    - path: "./test"
+      component: "test:shopping-cart-tests"
