@@ -7,7 +7,6 @@ import qualified Data.UUID                     as UUID
 import           Domain.Order
 import           Domain.User
 import           Effects.Logger
-import           Http.Params
 import           Http.Routes.Version
 import           Servant
 import           Services.Orders                ( Orders )

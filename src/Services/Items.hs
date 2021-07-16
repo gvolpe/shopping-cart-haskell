@@ -8,12 +8,10 @@ module Services.Items
   )
 where
 
-import           Data.Functor                   ( void )
 import           Data.Maybe                     ( listToMaybe )
 import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple
-import           Database.PostgreSQL.Simple.FromField
 import           Domain.Brand
 import           Domain.Category
 import           Domain.Item

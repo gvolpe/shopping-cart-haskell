@@ -4,7 +4,6 @@ module Domain.Order where
 
 import           Data.Aeson
 import           Data.Map
-import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
 import           Database.PostgreSQL.Simple
 import           Domain.Cart
@@ -28,8 +27,8 @@ instance ToJSON OrderId where
   toJSON (OrderId i) = toJSON i
 
 instance ToJSON Order where
-  toJSON (Order orderId paymentId items total) = object
-    [ "order_id" .= orderId
+  toJSON (Order oid paymentId items total) = object
+    [ "order_id" .= oid
     , "payment_id" .= paymentId
     , "items" .= items
     , "total" .= total

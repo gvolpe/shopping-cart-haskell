@@ -1,9 +1,7 @@
 module Effects.Background where
 
 import           Control.Concurrent.Async       ( async )
-import           Control.Concurrent             ( forkIO
-                                                , threadDelay
-                                                )
+import           Control.Concurrent             ( threadDelay )
 import           Data.Functor                   ( void )
 import           Refined
 

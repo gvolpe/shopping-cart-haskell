@@ -13,8 +13,8 @@ import           Domain.Payment
 import           Domain.User
 import           Hedgehog
 import qualified Http.Clients.Payments         as P
+import           Orphan                         ( )
 import           Refined
-import           Refined.Instances              ( )
 
 prop_payments :: Property
 prop_payments = withTests (1 :: TestLimit) payments

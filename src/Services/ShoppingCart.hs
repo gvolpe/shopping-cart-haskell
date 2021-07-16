@@ -32,17 +32,18 @@ data ShoppingCart m = ShoppingCart
 
 mkShoppingCart
   :: Connection -> Items IO -> CartExpiration -> IO (ShoppingCart IO)
-mkShoppingCart c i exp = pure $ ShoppingCart { add        = add' c exp
-                                             , get        = get' c i
-                                             , delete     = delete' c
-                                             , removeItem = removeItem' c
-                                             , update     = update' c exp
-                                             }
+mkShoppingCart c i exp' = pure $ ShoppingCart { add        = add' c exp'
+                                              , get        = get' c i
+                                              , delete     = delete' c
+                                              , removeItem = removeItem' c
+                                              , update     = update' c exp'
+                                              }
 
 add' :: Connection -> CartExpiration -> UserId -> ItemId -> Quantity -> IO ()
-add' conn (CartExpiration exp) (UserId uid) (ItemId i) (Quantity q) = R.runRedis conn $ do
-  R.hset k f v
-  void $ R.expire k exp
+add' conn (CartExpiration exp') (UserId uid) (ItemId i) (Quantity q) =
+  R.runRedis conn $ do
+    void $ R.hset k f v
+    void $ R.expire k exp'
  where
   k = C.pack $ UUID.toString uid
   f = C.pack $ UUID.toString i

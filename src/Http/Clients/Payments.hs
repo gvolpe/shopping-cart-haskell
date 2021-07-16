@@ -7,8 +7,6 @@ module Http.Clients.Payments
 where
 
 import           Data.Aeson                     ( toJSON )
-import           Data.Text                      ( Text )
-import qualified Data.Text                     as T
 import           Domain.Payment
 import           Http.Client
 import           Network.Wreq                   ( defaults )

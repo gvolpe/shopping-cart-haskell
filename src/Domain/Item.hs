@@ -5,8 +5,8 @@ module Domain.Item
   , ItemName(..)
   , ItemDescription(..)
   , Item(..)
-  , CreateItem(..)
-  , UpdateItem(..)
+  , CreateItem
+  , UpdateItem
   , Money(..)
   )
 where
@@ -19,7 +19,6 @@ import           Database.PostgreSQL.Simple
 import           Domain.Brand
 import           Domain.Category
 import           GHC.Generics                   ( Generic )
-import           GHC.Real                       ( Ratio )
 
 newtype ItemId = ItemId UUID deriving (Eq, Generic, Ord, Show, ToRow)
 newtype ItemName = ItemName Text deriving (Generic, ToRow, Show)
@@ -60,20 +59,21 @@ instance ToJSONKey ItemId
 
 instance FromJSON Item where
   parseJSON = withObject "Item json" $ \o -> do
-    i  <- o .: "uuid"
-    n  <- o .: "name"
-    d  <- o .: "description"
-    p  <- o .: "price"
-    b  <- o .: "brand"
-    c  <- o .: "category"
+    i <- o .: "uuid"
+    n <- o .: "name"
+    d <- o .: "description"
+    p <- o .: "price"
+    b <- o .: "brand"
+    c <- o .: "category"
     return $ Item i (ItemName n) (ItemDescription d) p b c
 
 instance ToJSON Item where
-  toJSON (Item (ItemId iid) (ItemName name) (ItemDescription desc) price brand category) = object
-    [ "uuid" .= iid
-    , "name" .= name
-    , "description" .= desc
-    , "price" .= price
-    , "brand" .= brand
-    , "category" .= category
-    ]
+  toJSON (Item (ItemId iid) (ItemName name) (ItemDescription desc) price brand category)
+    = object
+      [ "uuid" .= iid
+      , "name" .= name
+      , "description" .= desc
+      , "price" .= price
+      , "brand" .= brand
+      , "category" .= category
+      ]

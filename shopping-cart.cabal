@@ -32,9 +32,9 @@ library
                      , Http.Routes.Orders
                      , Http.Routes.Version
                      , Http.Server
+                     , Orphan
                      , Programs.Checkout
                      , Refined.Helper
-                     , Refined.Instances
                      , Resources
                      , Services
                      , Services.Brands
@@ -73,6 +73,7 @@ library
                      , wreq
   hs-source-dirs:      src
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 test-Suite shopping-cart-tests
   type:                exitcode-stdio-1.0
@@ -96,3 +97,4 @@ executable shopping-cart
   build-depends:       base
                      , shopping-cart
   default-language:    Haskell2010
+  ghc-options:         -Wall

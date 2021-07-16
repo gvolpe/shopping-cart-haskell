@@ -4,14 +4,13 @@ module Refined.Helper where
 
 import           Control.Arrow                  ( left )
 import           Data.Text                      ( Text )
-import qualified Data.Text.Lazy               as TextLazy
-import qualified Data.Text.Lazy.Builder       as TextBuilder
-import qualified Data.Text.Lazy.Builder.Int   as TextBuilder
+import qualified Data.Text.Lazy                as TextLazy
+import qualified Data.Text.Lazy.Builder        as TextBuilder
+import qualified Data.Text.Lazy.Builder.Int    as TextBuilder
 import           GHC.Exts                       ( Proxy#
                                                 , proxy#
                                                 )
 import           GHC.TypeLits                   ( KnownNat
-                                                , Nat
                                                 , natVal'
                                                 )
 import           Refined
@@ -25,14 +24,12 @@ f .> g = \x -> g (f x)
 
 -- helper function to make sure natVal calls are
 -- zero runtime overhead
-nv :: forall n. KnownNat n => Integer
+nv :: forall n . KnownNat n => Integer
 nv = natVal' (proxy# :: Proxy# n)
 
 -- convert an Integral number to Text
 i2text :: Integral a => a -> Text
-i2text = TextBuilder.decimal
-  .> TextBuilder.toLazyText
-  .> TextLazy.toStrict
+i2text = TextBuilder.decimal .> TextBuilder.toLazyText .> TextLazy.toStrict
 {-# SPECIALISE i2text :: Int -> Text #-}
 {-# SPECIALISE i2text :: Integer -> Text #-}
 

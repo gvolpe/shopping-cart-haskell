@@ -9,7 +9,6 @@ import           Domain.Checkout
 import           Domain.Order
 import           Domain.User
 import           Effects.Logger
-import           Http.Params
 import           Http.Routes.Version
 import           Programs.Checkout              ( Checkout )
 import qualified Programs.Checkout             as PC

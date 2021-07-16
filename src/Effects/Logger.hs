@@ -1,8 +1,6 @@
 module Effects.Logger where
 
-import           Control.Monad.IO.Class         ( MonadIO
-                                                , liftIO
-                                                )
+import           Control.Monad.IO.Class         ( liftIO )
 import           Colog.Core.Action              ( (<&) )
 import           Colog.Core.IO                  ( logStringStdout
                                                 , logStringStderr
@@ -17,9 +15,9 @@ class Logger m where
   logError :: Text -> m ()
 
 instance Logger IO where
-  logInfo = liftIO . (logStringStdout <&) . unpack
+  logInfo  = liftIO . (logStringStdout <&) . unpack
   logError = liftIO . (logStringStderr <&) . unpack
 
 instance Logger Handler where
-  logInfo = liftIO . (logStringStdout <&) . unpack
+  logInfo  = liftIO . (logStringStdout <&) . unpack
   logError = liftIO . (logStringStderr <&) . unpack

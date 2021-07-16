@@ -4,7 +4,6 @@ module Domain.Payment where
 
 import           Data.Aeson
 import           Data.UUID                      ( UUID )
-import qualified Data.Text                     as T
 import           Domain.Checkout
 import           Domain.Item
 import           Domain.User
@@ -22,6 +21,7 @@ data Payment = Payment
 
 instance FromJSON PaymentId where
   parseJSON (Object v) = PaymentId <$> v .: "paymentId"
+  parseJSON _          = error "Not a JSON object"
 
 instance ToJSON PaymentId where
   toJSON (PaymentId i) = toJSON i
