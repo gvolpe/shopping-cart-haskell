@@ -9,9 +9,7 @@ module Programs.Checkout
 where
 
 import           Control.Monad.Catch
-import           Control.Monad.IO.Class         ( MonadIO
-                                                , liftIO
-                                                )
+import           Control.Monad.IO.Class         ( MonadIO )
 import           Control.Retry
 import           Data.Functor                   ( void )
 import qualified Data.Text                     as T

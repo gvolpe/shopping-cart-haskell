@@ -6,7 +6,6 @@ module Http.Server
   )
 where
 
-import           Data.Aeson
 import           Data.Proxy
 import           Effects.Logger
 import           Http.Routes.Brands
@@ -15,8 +14,6 @@ import           Http.Routes.Checkout
 import           Http.Routes.Items
 import           Http.Routes.Orders
 import           Servant
-import           Servant.API
-import           Network.Wai                    ( Application )
 import           Network.Wai.Handler.Warp       ( run )
 import           Network.Wai.Middleware.Cors    ( simpleCors )
 import           Services

@@ -6,12 +6,9 @@ module Http.Client
 where
 
 import           Control.Lens
-import           Data.Aeson                     ( FromJSON
-                                                , toJSON
-                                                )
+import           Data.Aeson                     ( FromJSON )
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
-import           Domain.Payment
 import           Network.Wreq
 import           Network.Wreq.Types             ( Postable )
 

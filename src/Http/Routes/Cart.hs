@@ -10,7 +10,6 @@ import qualified Data.UUID                     as UUID
 import           Domain.Cart
 import           Domain.User
 import           Effects.Logger
-import           Http.Params
 import           Http.Routes.Version
 import           Servant
 import           Services.ShoppingCart          ( ShoppingCart )

@@ -8,25 +8,19 @@ module Services.Orders
 where
 
 import           Data.Aeson                     ( toJSON )
-import           Data.Aeson.Types               ( Value )
-import           Data.Bifunctor                 ( bimap )
-import           Data.Functor                   ( void )
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as M
 import           Data.Maybe                     ( listToMaybe )
-import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
-import qualified Data.UUID                     as UUID
 import qualified Data.UUID.V4                  as UUID
 import           Database.PostgreSQL.Simple
-import           Database.PostgreSQL.Simple.FromField
-import           Database.PostgreSQL.Simple.ToField
 import           Domain.Cart
 import           Domain.Item
 import           Domain.Order
 import           Domain.Payment
 import           Domain.User
 import           GHC.Generics                   ( Generic )
+import           Orphan                         ( )
 
 data Orders m = Orders
   { get :: UserId -> OrderId -> m (Maybe Order)
@@ -40,9 +34,6 @@ mkOrders conn = pure $ Orders
   , findBy = (fmap . fmap) toDomain . findBy' conn
   , create = create' conn
   }
-
-instance FromField [CartItem] where
-  fromField = fromJSONField
 
 data OrderDTO = OrderDTO
   { _orderId :: UUID
@@ -78,7 +69,5 @@ create'
   :: Connection -> UserId -> PaymentId -> [CartItem] -> Money -> IO OrderId
 create' conn (UserId uid) (PaymentId pid) its (Money money) = do
   oid <- OrderId <$> UUID.nextRandom
-  executeMany conn "INSERT INTO orders VALUES (?, ?, ?, ?, ?)" (values oid)
-  pure oid
- where
-  values (OrderId oid) = [(oid, uid, pid, toJSON its, money)]
+  oid <$ executeMany conn "INSERT INTO orders VALUES (?, ?, ?, ?, ?)" (values oid)
+  where values (OrderId oid) = [(oid, uid, pid, toJSON its, money)]

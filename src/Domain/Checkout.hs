@@ -4,24 +4,21 @@
 
 module Domain.Checkout where
 
-import           Control.Monad                  ( unless )
 import           Control.Monad.Catch            ( Exception )
 import           Control.ParDual.Class
 import           Data.Aeson
 import           Data.Text                      ( Text )
 import           Data.Typeable                  ( typeOf )
-import           Data.UUID                      ( UUID )
 import           GHC.Generics                   ( Generic )
 import           GHC.TypeLits                   ( KnownNat
                                                 , Nat
-                                                , natVal'
                                                 )
+import           Orphan                         ( )
 import           Refined
 import           Refined.Helper                 ( i2text
                                                 , nv
                                                 , ref
                                                 )
-import           Refined.Instances              ( )
 
 data OrderError = OrderError deriving (Exception, Show)
 data PaymentError = PaymentError deriving (Exception, Show)
@@ -73,6 +70,6 @@ instance FromJSON Card where
       Right card -> return card
 
 instance ToJSON Card where
-  toJSON (Card (CardName name) (CardNumber number) (CardExpiration exp) (CardCVV cvv))
+  toJSON (Card (CardName name) (CardNumber number) (CardExpiration exp') (CardCVV cvv))
     = object
-      ["name" .= name, "number" .= number, "expiration" .= exp, "cvv" .= cvv]
+      ["name" .= name, "number" .= number, "expiration" .= exp', "cvv" .= cvv]

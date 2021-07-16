@@ -18,9 +18,9 @@ main = do
   Res {..} <- mkResources
   brands   <- SB.mkBrands psql
   items    <- SI.mkItems psql
-  cart     <- SC.mkShoppingCart redis items exp
+  cart     <- SC.mkShoppingCart redis items exp'
   orders   <- SO.mkOrders psql
   client   <- P.mkPaymentClient
   checkout <- PC.mkCheckout client cart orders
   runServer (Services brands cart checkout items orders client)
-  where exp = CartExpiration (30 * 60)
+  where exp' = CartExpiration (30 * 60)
