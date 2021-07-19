@@ -1,6 +1,4 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances, KindSignatures, MultiParamTypeClasses #-}
-{-# LANGUAGE ScopedTypeVariables, TypeApplications #-}
 
 module Domain.Checkout where
 
@@ -8,31 +6,14 @@ import           Control.Monad.Catch            ( Exception )
 import           Control.ParDual.Class
 import           Data.Aeson
 import           Data.Text                      ( Text )
-import           Data.Typeable                  ( typeOf )
 import           GHC.Generics                   ( Generic )
-import           GHC.TypeLits                   ( KnownNat
-                                                , Nat
-                                                )
 import           Orphan                         ( )
 import           Refined
-import           Refined.Helper                 ( i2text
-                                                , nv
-                                                , ref
-                                                )
+import           Refined.HasDigits
+import           Refined.Helper                 ( ref )
 
 data OrderError = OrderError deriving (Exception, Show)
 data PaymentError = PaymentError deriving (Exception, Show)
-
-data HasDigits (n :: Nat) = HasDigits deriving Generic
-
-instance (Integral x, Show x, KnownNat n) => Predicate (HasDigits n) x where
-  validate p x = do
-    let n = fromIntegral (nv @n)
-    if n == toInteger (length $ show x)
-      then Nothing
-      else throwRefineOtherException
-        (typeOf p)
-        ("Invalid number of digits. Expected " <> i2text n)
 
 type CardNamePred = Refined NonEmpty Text
 type CardNumberPred = Refined (HasDigits 16) Int
