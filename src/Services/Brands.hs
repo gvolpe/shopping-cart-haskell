@@ -20,10 +20,10 @@ data Brands m = Brands
   , create :: BrandName -> m ()
   }
 
-mkBrands :: Connection -> IO (Brands IO)
-mkBrands c = pure $ Brands { findAll = (fmap . fmap) toDomain (findAll' c)
-                           , create  = create' c
-                           }
+mkBrands :: Connection -> Brands IO
+mkBrands c = Brands { findAll = (fmap . fmap) toDomain (findAll' c)
+                    , create  = create' c
+                    }
 
 data BrandDTO = BrandDTO
   { _brandId :: UUID

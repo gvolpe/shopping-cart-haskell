@@ -15,10 +15,10 @@ data PaymentClient m = PaymentClient
   { processPayment :: Payment -> m PaymentId
   }
 
-mkPaymentClient :: (Applicative m, HTTPClient m) => m (PaymentClient m)
-mkPaymentClient = pure $ PaymentClient process'
+mkPaymentClient :: HTTPClient m => PaymentClient m
+mkPaymentClient = PaymentClient process'
 
-process' :: (Applicative m, HTTPClient m) => Payment -> m PaymentId
+process' :: HTTPClient m => Payment -> m PaymentId
 process' payment =
   let url = "https://payments.free.beeceptor.com/payments"
       ops = defaults

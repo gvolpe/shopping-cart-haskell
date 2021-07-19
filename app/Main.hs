@@ -3,24 +3,23 @@
 module Main where
 
 import           Domain.Cart                    ( CartExpiration(..) )
-import qualified Http.Clients.Payments         as P
+import           Http.Clients.Payments          ( mkPaymentClient )
 import           Http.Server                    ( runServer )
 import           Resources
-import qualified Programs.Checkout             as PC
-import qualified Services.Brands               as SB
-import qualified Services.Items                as SI
-import qualified Services.Orders               as SO
-import qualified Services.ShoppingCart         as SC
+import           Programs.Checkout              ( mkCheckout )
+import           Services.Brands                ( mkBrands )
+import           Services.Items                 ( mkItems )
+import           Services.Orders                ( mkOrders )
+import           Services.ShoppingCart          ( mkShoppingCart )
 import           Services
 
 main :: IO ()
-main = do
-  Res {..} <- mkResources
-  brands   <- SB.mkBrands psql
-  items    <- SI.mkItems psql
-  cart     <- SC.mkShoppingCart redis items exp'
-  orders   <- SO.mkOrders psql
-  client   <- P.mkPaymentClient
-  checkout <- PC.mkCheckout client cart orders
-  runServer (Services brands cart checkout items orders client)
-  where exp' = CartExpiration (30 * 60)
+main = mkResources >>= \Res {..} ->
+  let brands   = mkBrands psql
+      items    = mkItems psql
+      cart     = mkShoppingCart redis items exp'
+      orders   = mkOrders psql
+      client   = mkPaymentClient
+      checkout = mkCheckout client cart orders
+      exp'     = CartExpiration (30 * 60)
+  in  runServer (Services brands cart checkout items orders client)

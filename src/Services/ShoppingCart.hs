@@ -29,13 +29,13 @@ data ShoppingCart m = ShoppingCart
   }
 
 mkShoppingCart
-  :: Connection -> Items IO -> CartExpiration -> IO (ShoppingCart IO)
-mkShoppingCart c i exp' = pure $ ShoppingCart { add        = add' c exp'
-                                              , get        = get' c i
-                                              , delete     = delete' c
-                                              , removeItem = removeItem' c
-                                              , update     = update' c exp'
-                                              }
+  :: Connection -> Items IO -> CartExpiration -> ShoppingCart IO
+mkShoppingCart c i exp' = ShoppingCart { add        = add' c exp'
+                                       , get        = get' c i
+                                       , delete     = delete' c
+                                       , removeItem = removeItem' c
+                                       , update     = update' c exp'
+                                       }
 
 add' :: Connection -> CartExpiration -> UserId -> ItemId -> Quantity -> IO ()
 add' conn (CartExpiration exp') (UserId uid) (ItemId i) (Quantity q) =

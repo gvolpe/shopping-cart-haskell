@@ -30,6 +30,6 @@ psqlResource = do
   liftIO $ P.connect P.ConnectInfo { P.connectHost     = "localhost"
                                    , P.connectPort     = 5432
                                    , P.connectUser     = "postgres"
-                                   , P.connectPassword = ""
+                                   , P.connectPassword = "my-password"
                                    , P.connectDatabase = "store"
                                    }

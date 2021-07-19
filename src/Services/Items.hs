@@ -26,13 +26,13 @@ data Items m = Items
   , update :: UpdateItem -> m ()
   }
 
-mkItems :: Connection -> IO (Items IO)
-mkItems c = pure $ Items { findAll  = (fmap . fmap) toDomain (findAll' c)
-                         , findBy   = (fmap . fmap) toDomain . findBy' c
-                         , findById = (fmap . fmap) toDomain . findById' c
-                         , create   = create' c
-                         , update   = update' c
-                         }
+mkItems :: Connection -> Items IO
+mkItems c = Items { findAll  = (fmap . fmap) toDomain (findAll' c)
+                  , findBy   = (fmap . fmap) toDomain . findBy' c
+                  , findById = (fmap . fmap) toDomain . findById' c
+                  , create   = create' c
+                  , update   = update' c
+                  }
 
 data ItemDTO = ItemDTO
   { _itemId :: UUID

@@ -14,7 +14,6 @@ import           Control.Retry                  ( RetryPolicyM
                                                 , limitRetries
                                                 , exponentialBackoff
                                                 )
-import           Data.Functor                   ( void )
 import qualified Data.Text                     as T
 import qualified Data.UUID                     as UUID
 import           Domain.Cart
@@ -43,8 +42,8 @@ mkCheckout
   => PaymentClient m
   -> ShoppingCart m
   -> Orders m
-  -> m (Checkout m)
-mkCheckout p s o = pure $ Checkout (process' p s o)
+  -> Checkout m
+mkCheckout p s o = Checkout (process' p s o)
 
 policy :: Monad m => RetryPolicyM m
 policy = limitRetries 3 <> exponentialBackoff 10000
@@ -102,5 +101,4 @@ process' pc sc so uid card = do
   paymentId      <- processPayment' pc $ Payment uid cartTotal card
   orderId        <- createOrder' so uid paymentId cartItems cartTotal
   logWith "[Checkout] - Deleting shopping cart for " uid
-  void . attempt $ SC.delete sc uid
-  pure orderId
+  orderId <$ attempt (SC.delete sc uid)

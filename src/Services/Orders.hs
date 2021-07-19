@@ -28,8 +28,8 @@ data Orders m = Orders
   , create :: UserId -> PaymentId -> [CartItem] -> Money -> m OrderId
   }
 
-mkOrders :: Connection -> IO (Orders IO)
-mkOrders conn = pure $ Orders
+mkOrders :: Connection -> Orders IO
+mkOrders conn = Orders
   { get    = \uid oid -> (fmap . fmap) toDomain (get' conn uid oid)
   , findBy = (fmap . fmap) toDomain . findBy' conn
   , create = create' conn
