@@ -7,7 +7,7 @@ Haskell version of the Shopping Cart developed in the book [Practical FP in Scal
 
 ### How to run
 
-Within a Nix Shell (run `nix-shell` - recommended), follow the commands below.
+Within a [Nix](https://nixos.org/) shell (run `nix-shell` - recommended), follow the commands below.
 
 #### Run web application
 
@@ -25,13 +25,13 @@ cabal new-run shopping-cart-tests
 
 The [original version](https://github.com/gvolpe/pfps-shopping-cart) of the Shopping Cart has been written in [Scala](https://www.scala-lang.org/). The Haskell application's design is quite similar.
 
-- Algebras, here called services, are represented using polymorphic records of functions.
-- Newtypes / Refined is used for strongly-typed data.
-- Retry is used for retrying computations compositionally.
-- Servant is used as the default HTTP server.
-- Wreq is used as the default HTTP client.
-- Hedis is used as the default Redis client.
-- PostgreSQL Simple + Raw Strings QQ are used to handle PostgreSQL stuff.
+- Services are represented using polymorphic records of functions.
+- The Newtypes / [Refined](https://hackage.haskell.org/package/refined) duo is used for strongly-typed data.
+- [Retry](https://hackage.haskell.org/package/retry) is used for retrying computations compositionally.
+- [Servant](https://hackage.haskell.org/package/servant) is used as the default HTTP server.
+- [Wreq](https://hackage.haskell.org/package/wreq) is used as the default HTTP client.
+- [Hedis](https://hackage.haskell.org/package/hedis) is used as the default Redis client.
+- [PostgreSQL Simple](https://hackage.haskell.org/package/postgresql-simple) + [Raw Strings QQ](https://hackage.haskell.org/package/raw-strings-qq) are used to handle PostgreSQL stuff.
 
 A polymorphic record of functions looks as follows:
 
@@ -42,7 +42,7 @@ data Brands m = Brands
   }
 ```
 
-Whereas in Scala, we represent it using `trait`s:
+Whereas in Scala, we represent it using `trait`s (although `case class` / `class`es would work too):
 
 ```scala
 trait Brands[F[_]] {
@@ -59,7 +59,7 @@ class Brands m where
   create :: BrandName -> m ()
 ```
 
-Typeclasses were used to encode effects such as `Logger` and `Background`:
+Typeclasses were used to encode effects such as `Background`, `Logger` and `Retry`:
 
 ```haskell
 class Background m where
@@ -78,13 +78,13 @@ trait Background[F[_]] {
 }
 
 object Background {
+  def apply[F[_]: Background]: Background[F] = implicitly
 
-  implicit def concurrentBackground[F[_]: Concurrent: Timer]: Background[F] =
+  implicit def bgInstance[F[_]](implicit S: Supervisor[F], T: Temporal[F]): Background[F] =
     new Background[F] {
       def schedule[A](fa: F[A], duration: FiniteDuration): F[Unit] =
-        (Timer[F].sleep(duration) *> fa).start.void
+        S.supervise(T.sleep(duration) *> fa).void
     }
-
 }
 ```
 
