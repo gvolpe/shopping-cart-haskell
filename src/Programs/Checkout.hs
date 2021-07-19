@@ -9,8 +9,11 @@ module Programs.Checkout
 where
 
 import           Control.Monad.Catch
-import           Control.Monad.IO.Class         ( MonadIO )
-import           Control.Retry
+import           Control.Retry                  ( RetryPolicyM
+                                                , RetryStatus(..)
+                                                , limitRetries
+                                                , exponentialBackoff
+                                                )
 import           Data.Functor                   ( void )
 import qualified Data.Text                     as T
 import qualified Data.UUID                     as UUID
@@ -22,6 +25,7 @@ import           Domain.Payment
 import           Domain.User
 import           Effects.Background
 import           Effects.Logger
+import           Effects.Retry                  ( Retry(..) )
 import           Http.Clients.Payments          ( PaymentClient )
 import qualified Http.Clients.Payments         as PC
 import           Refined
@@ -35,7 +39,7 @@ data Checkout m = Checkout
   }
 
 mkCheckout
-  :: (Background m, Logger m, MonadIO m, MonadMask m)
+  :: (Background m, Logger m, MonadMask m, Retry m)
   => PaymentClient m
   -> ShoppingCart m
   -> Orders m
@@ -46,7 +50,7 @@ policy :: Monad m => RetryPolicyM m
 policy = limitRetries 3 <> exponentialBackoff 10000
 
 processPayment'
-  :: (Logger m, MonadIO m, MonadMask m)
+  :: (Logger m, MonadMask m, Retry m)
   => PaymentClient m
   -> Payment
   -> m PaymentId
@@ -55,11 +59,11 @@ processPayment' client payment =
         logInfo $ "[Checkout] - Processing payment #" <> T.pack
           (show rsIterNumber)
         PC.processPayment client payment
-  in  recoverAll policy action
+  in  retry policy action
 
 createOrder'
   :: forall m
-   . (Background m, Logger m, MonadIO m, MonadMask m)
+   . (Background m, Logger m, MonadMask m, Retry m)
   => Orders m
   -> UserId
   -> PaymentId
@@ -75,7 +79,7 @@ createOrder' orders uid pid items total =
       action RetryStatus {..} = do
         logInfo $ "[Checkout] - Creating order #" <> T.pack (show rsIterNumber)
         SO.create orders uid pid items total
-  in  bgAction $ recoverAll policy action
+  in  bgAction $ retry policy action
 
 logWith :: Logger m => T.Text -> UserId -> m ()
 logWith t (UserId uid) = logInfo $ t <> UUID.toText uid
@@ -85,7 +89,7 @@ attempt = try
 
 process'
   :: forall m
-   . (Background m, Logger m, MonadIO m, MonadMask m)
+   . (Background m, Logger m, MonadMask m, Retry m)
   => PaymentClient m
   -> ShoppingCart m
   -> Orders m

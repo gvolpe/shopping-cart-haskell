@@ -22,6 +22,7 @@ library
                      , Domain.User
                      , Effects.Background
                      , Effects.Logger
+                     , Effects.Retry
                      , Http.Client
                      , Http.Clients.Payments
                      , Http.Params
