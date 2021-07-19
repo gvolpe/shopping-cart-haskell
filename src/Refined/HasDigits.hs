@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE DataKinds, DeriveGeneric, OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances, KindSignatures, MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables, TypeApplications #-}
 

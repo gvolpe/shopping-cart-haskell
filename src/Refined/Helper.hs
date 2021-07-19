@@ -19,7 +19,7 @@ infixl 9 .>
 
 -- | Helper function, stolen from the flow package.
 (.>) :: (a -> b) -> (b -> c) -> a -> c
-f .> g = \x -> g (f x)
+f .> g = g . f
 {-# INLINE (.>) #-}
 
 -- helper function to make sure natVal calls are

@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module Services.ShoppingCart
   ( ShoppingCart(..)
   , mkShoppingCart
@@ -51,8 +49,8 @@ add' conn (CartExpiration exp') (UserId uid) (ItemId i) (Quantity q) =
 
 calcTotal :: [CartItem] -> Money
 calcTotal = foldMap
-  (\(CartItem cartItem (Quantity q)) ->
-    itemPrice cartItem * (Money $ fromIntegral q)
+  (\(CartItem cartItem' (Quantity q)) ->
+    itemPrice cartItem' * Money (fromIntegral q)
   )
 
 get' :: Connection -> Items IO -> UserId -> IO CartTotal

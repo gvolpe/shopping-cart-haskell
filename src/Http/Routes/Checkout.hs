@@ -1,5 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
 
 module Http.Routes.Checkout where
 
