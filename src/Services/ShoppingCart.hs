@@ -28,8 +28,7 @@ data ShoppingCart m = ShoppingCart
   , update :: UserId -> Cart -> m ()
   }
 
-mkShoppingCart
-  :: Connection -> Items IO -> CartExpiration -> ShoppingCart IO
+mkShoppingCart :: Connection -> Items IO -> CartExpiration -> ShoppingCart IO
 mkShoppingCart c i exp' = ShoppingCart { add        = add' c exp'
                                        , get        = get' c i
                                        , delete     = delete' c
@@ -70,10 +69,10 @@ delete' conn (UserId uid) =
   R.runRedis conn . void $ R.del [C.pack $ UUID.toString uid]
 
 removeItem' :: Connection -> UserId -> ItemId -> IO ()
-removeItem' conn (UserId uid) (ItemId i) = R.runRedis conn . void $ R.hdel k [f]
- where
-  k = C.pack $ UUID.toString uid
-  f = C.pack $ UUID.toString i
+removeItem' conn (UserId uid) (ItemId i) =
+  let k = C.pack $ UUID.toString uid
+      f = C.pack $ UUID.toString i
+  in  R.runRedis conn . void $ R.hdel k [f]
 
 -- TODO: implement
 update' :: Connection -> CartExpiration -> UserId -> Cart -> IO ()

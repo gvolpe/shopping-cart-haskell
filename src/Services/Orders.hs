@@ -8,6 +8,7 @@ module Services.Orders
 where
 
 import           Data.Aeson                     ( toJSON )
+import           Data.List.NonEmpty             ( NonEmpty )
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as M
 import           Data.Maybe                     ( listToMaybe )
@@ -25,7 +26,7 @@ import           Orphan                         ( )
 data Orders m = Orders
   { get :: UserId -> OrderId -> m (Maybe Order)
   , findBy :: UserId -> m [Order]
-  , create :: UserId -> PaymentId -> [CartItem] -> Money -> m OrderId
+  , create :: UserId -> PaymentId -> NonEmpty CartItem -> Money -> m OrderId
   }
 
 mkOrders :: Connection -> Orders IO
@@ -66,8 +67,15 @@ findBy' :: Connection -> UserId -> IO [OrderDTO]
 findBy' = flip query "SELECT * FROM orders WHERE user_id = ?"
 
 create'
-  :: Connection -> UserId -> PaymentId -> [CartItem] -> Money -> IO OrderId
+  :: Connection
+  -> UserId
+  -> PaymentId
+  -> NonEmpty CartItem
+  -> Money
+  -> IO OrderId
 create' conn (UserId uid) (PaymentId pid) its (Money money) = do
   oid <- OrderId <$> UUID.nextRandom
-  oid <$ executeMany conn "INSERT INTO orders VALUES (?, ?, ?, ?, ?)" (values oid)
+  oid <$ executeMany conn
+                     "INSERT INTO orders VALUES (?, ?, ?, ?, ?)"
+                     (values oid)
   where values (OrderId oid) = [(oid, uid, pid, toJSON its, money)]

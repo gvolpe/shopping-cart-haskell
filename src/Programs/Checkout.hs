@@ -14,6 +14,7 @@ import           Control.Retry                  ( RetryPolicyM
                                                 , limitRetries
                                                 , exponentialBackoff
                                                 )
+import qualified Data.List.NonEmpty            as NEL
 import qualified Data.Text                     as T
 import qualified Data.UUID                     as UUID
 import           Domain.Cart
@@ -32,6 +33,9 @@ import           Services.Orders                ( Orders )
 import qualified Services.Orders               as SO
 import           Services.ShoppingCart          ( ShoppingCart )
 import qualified Services.ShoppingCart         as SC
+import           Utils.Errors                   ( attempt
+                                                , ensureNonEmpty
+                                                )
 
 data Checkout m = Checkout
   { process :: UserId -> Card -> m OrderId
@@ -66,7 +70,7 @@ createOrder'
   => Orders m
   -> UserId
   -> PaymentId
-  -> [CartItem]
+  -> NEL.NonEmpty CartItem
   -> Money
   -> m OrderId
 createOrder' orders uid pid items total =
@@ -83,9 +87,6 @@ createOrder' orders uid pid items total =
 logWith :: Logger m => T.Text -> UserId -> m ()
 logWith t (UserId uid) = logInfo $ t <> UUID.toText uid
 
-attempt :: forall m a . MonadMask m => m a -> m (Either SomeException a)
-attempt = try
-
 process'
   :: forall m
    . (Background m, Logger m, MonadMask m, Retry m)
@@ -98,7 +99,8 @@ process'
 process' pc sc so uid card = do
   logWith "[Checkout] - Retrieving shopping cart for " uid
   CartTotal {..} <- SC.get sc uid
+  cartItems'     <- ensureNonEmpty EmptyCartError cartItems
   paymentId      <- processPayment' pc $ Payment uid cartTotal card
-  orderId        <- createOrder' so uid paymentId cartItems cartTotal
+  orderId        <- createOrder' so uid paymentId cartItems' cartTotal
   logWith "[Checkout] - Deleting shopping cart for " uid
   orderId <$ attempt (SC.delete sc uid)

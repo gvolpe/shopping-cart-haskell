@@ -2,6 +2,7 @@
 
 module Domain.Order where
 
+import           Control.Monad.Catch
 import           Data.Aeson
 import           Data.Map
 import           Data.UUID                      ( UUID )
@@ -22,6 +23,10 @@ data Order = Order
   , orderItems :: Map ItemId Quantity
   , orderTotal :: Money
   } deriving (Generic, Show)
+
+data EmptyCartError = EmptyCartError deriving Show
+
+instance Exception EmptyCartError
 
 instance ToJSON OrderId where
   toJSON (OrderId i) = toJSON i

@@ -43,6 +43,7 @@ library
                      , Services.Items
                      , Services.Orders
                      , Services.ShoppingCart
+                     , Utils.Errors
                      , Utils.Lift
                      , Utils.Redis
                      , Utils.Text
