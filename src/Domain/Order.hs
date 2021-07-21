@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving, OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, OverloadedStrings #-}
 
 module Domain.Order where
 
@@ -13,7 +14,9 @@ import           Domain.Payment
 import           GHC.Generics                   ( Generic )
 import           Servant                        ( FromHttpApiData )
 
-newtype OrderId = OrderId UUID deriving (Eq, FromHttpApiData, Generic, Ord, Show)
+newtype OrderId = OrderId UUID
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving newtype FromHttpApiData
 
 instance ToRow OrderId
 
@@ -24,9 +27,9 @@ data Order = Order
   , orderTotal :: Money
   } deriving (Generic, Show)
 
-data EmptyCartError = EmptyCartError deriving Show
-
-instance Exception EmptyCartError
+data EmptyCartError = EmptyCartError
+  deriving stock Show
+  deriving anyclass Exception
 
 instance ToJSON OrderId where
   toJSON (OrderId i) = toJSON i
