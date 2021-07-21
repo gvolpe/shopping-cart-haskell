@@ -18,7 +18,7 @@ import           GHC.Generics                   ( Generic )
 data Brands m = Brands
   { findAll :: m [Brand]
   , create :: BrandName -> m ()
-  }
+  } deriving Generic
 
 mkBrands :: Connection -> Brands IO
 mkBrands c = Brands { findAll = (fmap . fmap) toDomain (findAll' c)

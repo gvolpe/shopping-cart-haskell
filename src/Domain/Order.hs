@@ -35,9 +35,9 @@ instance ToJSON OrderId where
   toJSON (OrderId i) = toJSON i
 
 instance ToJSON Order where
-  toJSON (Order oid paymentId items total) = object
+  toJSON (Order oid paymentId _items _total) = object
     [ "order_id" .= oid
     , "payment_id" .= paymentId
-    , "items" .= items
-    , "total" .= total
+    , "items" .= _items
+    , "total" .= _total
     ]

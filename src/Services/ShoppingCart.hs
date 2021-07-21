@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+
 module Services.ShoppingCart
   ( ShoppingCart(..)
   , mkShoppingCart
@@ -15,10 +17,12 @@ import qualified Database.Redis                as R
 import           Domain.Cart
 import           Domain.Item
 import           Domain.User
+import           GHC.Generics                   ( Generic )
 import           Services.Items                 ( Items )
 import qualified Services.Items                as SI
 import           Utils.Lift                     ( liftMaybe )
 import qualified Utils.Redis                   as R
+import           Utils.Text                     ( logWith )
 
 data ShoppingCart m = ShoppingCart
   { add :: UserId -> ItemId -> Quantity -> m ()
@@ -26,7 +30,7 @@ data ShoppingCart m = ShoppingCart
   , delete :: UserId -> m ()
   , removeItem :: UserId -> ItemId -> m ()
   , update :: UserId -> Cart -> m ()
-  }
+  } deriving Generic
 
 mkShoppingCart :: Connection -> Items IO -> CartExpiration -> ShoppingCart IO
 mkShoppingCart c i exp' = ShoppingCart { add        = add' c exp'
@@ -53,19 +57,21 @@ calcTotal = foldMap
   )
 
 get' :: Connection -> Items IO -> UserId -> IO CartTotal
-get' conn items (UserId uid) = do
+get' conn items' u@(UserId uid) = do
+  logWith "[Checkout] - Retrieving shopping cart for " u
   res <- R.runRedisM conn $ R.hgetall (R.writeUUID uid)
   its <- wither
     (\(k, v) -> do
       it <- liftMaybe $ R.readUUID ItemId k
       qt <- liftMaybe $ R.readInt Quantity v
-      (<&> (`CartItem` qt)) <$> SI.findById items it
+      (<&> (`CartItem` qt)) <$> SI.findById items' it
     )
     res
   pure (CartTotal its $ calcTotal its)
 
 delete' :: Connection -> UserId -> IO ()
-delete' conn (UserId uid) =
+delete' conn u@(UserId uid) = do
+  logWith "[Checkout] - Deleting shopping cart for " u
   R.runRedis conn . void $ R.del [C.pack $ UUID.toString uid]
 
 removeItem' :: Connection -> UserId -> ItemId -> IO ()

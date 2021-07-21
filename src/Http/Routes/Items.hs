@@ -1,8 +1,10 @@
-{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
+{-# LANGUAGE DataKinds, OverloadedLabels, OverloadedStrings, TypeOperators #-}
 
 module Http.Routes.Items where
 
+import           Control.Lens
 import           Control.Monad.IO.Class         ( liftIO )
+import           Data.Generics.Labels           ( )
 import           Domain.Brand
 import           Domain.Item
 import           Effects.Logger
@@ -10,7 +12,6 @@ import           Http.Params
 import           Http.Routes.Version
 import           Servant
 import           Services.Items                 ( Items )
-import qualified Services.Items                as SI
 
 type ItemsAPI =
   ApiVersion :> "items" :> QueryParam "brand" BrandNameParam :> Get '[JSON] [Item]
@@ -19,10 +20,10 @@ itemsServer :: Items IO -> Server ItemsAPI
 itemsServer = findItems
 
 findItems :: Items IO -> Maybe BrandNameParam -> Handler [Item]
-findItems i (Just bn) = do
+findItems items (Just bn) = do
   logInfo $ "[Items] - Find by brand: " <> b
-  liftIO $ SI.findBy i brand
+  brand & items ^. #findBy & liftIO
   where brand@(BrandName b) = toBrandName bn
-findItems i Nothing = do
+findItems items Nothing = do
   logInfo "[Items] - Find all"
-  liftIO $ SI.findAll i
+  items ^. #findAll & liftIO

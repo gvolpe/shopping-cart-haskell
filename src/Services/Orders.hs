@@ -27,7 +27,7 @@ data Orders m = Orders
   { get :: UserId -> OrderId -> m (Maybe Order)
   , findBy :: UserId -> m [Order]
   , create :: UserId -> PaymentId -> NonEmpty CartItem -> Money -> m OrderId
-  }
+  } deriving Generic
 
 mkOrders :: Connection -> Orders IO
 mkOrders conn = Orders
@@ -52,8 +52,7 @@ toDomain OrderDTO {..} = Order { orderId        = OrderId _orderId
                                }
 
 parseItems :: [CartItem] -> Map ItemId Quantity
-parseItems xs =
-  M.fromList $ (\i -> (itemId $ cartItem i, cartQuantity i)) <$> xs
+parseItems xs = M.fromList $ (\i -> (itemId $ item i, quantity i)) <$> xs
 
 selectByUserAndOrderQuery :: Query
 selectByUserAndOrderQuery =
