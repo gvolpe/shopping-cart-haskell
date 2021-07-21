@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, OverloadedLabels, OverloadedStrings #-}
 
 module Services.ShoppingCart
   ( ShoppingCart(..)
@@ -6,21 +6,20 @@ module Services.ShoppingCart
   )
 where
 
+import           Control.Lens
 import qualified Data.ByteString.Char8         as C
-import           Data.Functor                   ( (<&>)
-                                                , void
-                                                )
+import           Data.Functor                   ( void )
+import           Data.Generics.Labels           ( )
 import qualified Data.UUID                     as UUID
 import           Data.Witherable
 import           Database.Redis                 ( Connection )
 import qualified Database.Redis                as R
-import           Domain.Cart
+import           Domain.Cart             hiding ( items )
 import           Domain.Item
 import           Domain.User
 import           GHC.Generics                   ( Generic )
 import           Services.Items                 ( Items )
-import qualified Services.Items                as SI
-import           Utils.Lift                     ( liftMaybe )
+import           Utils.Errors                   ( liftMaybe )
 import qualified Utils.Redis                   as R
 import           Utils.Text                     ( logWith )
 
@@ -43,31 +42,25 @@ mkShoppingCart c i exp' = ShoppingCart { add        = add' c exp'
 add' :: Connection -> CartExpiration -> UserId -> ItemId -> Quantity -> IO ()
 add' conn (CartExpiration exp') (UserId uid) (ItemId i) (Quantity q) =
   R.runRedis conn $ do
-    void $ R.hset k f v
-    void $ R.expire k exp'
+    R.hset k f v & void
+    R.expire k exp' & void
  where
   k = C.pack $ UUID.toString uid
   f = C.pack $ UUID.toString i
   v = C.pack $ show q
 
-calcTotal :: [CartItem] -> Money
-calcTotal = foldMap
-  (\(CartItem cartItem' (Quantity q)) ->
-    itemPrice cartItem' * Money (fromIntegral q)
-  )
-
 get' :: Connection -> Items IO -> UserId -> IO CartTotal
-get' conn items' u@(UserId uid) = do
+get' conn items u@(UserId uid) = do
   logWith "[Checkout] - Retrieving shopping cart for " u
   res <- R.runRedisM conn $ R.hgetall (R.writeUUID uid)
   its <- wither
     (\(k, v) -> do
-      it <- liftMaybe $ R.readUUID ItemId k
-      qt <- liftMaybe $ R.readInt Quantity v
-      (<&> (`CartItem` qt)) <$> SI.findById items' it
+      it <- R.readUUID ItemId k & liftMaybe
+      qt <- R.readInt Quantity v & liftMaybe
+      (<&> (`CartItem` qt)) <$> (it & items ^. #findById)
     )
     res
-  pure (CartTotal its $ calcTotal its)
+  pure (CartTotal its $ foldMap subTotal its)
 
 delete' :: Connection -> UserId -> IO ()
 delete' conn u@(UserId uid) = do

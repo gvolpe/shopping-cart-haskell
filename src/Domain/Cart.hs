@@ -20,6 +20,10 @@ data CartItem = CartItem
   , quantity :: Quantity
   } deriving (Generic, Show)
 
+subTotal :: CartItem -> Money
+subTotal (CartItem item' (Quantity q)) =
+  itemPrice item' * Money (fromIntegral q)
+
 data CartTotal = CartTotal
   { items :: [CartItem]
   , total :: Money
