@@ -9,6 +9,9 @@ import           Data.Char                      ( toLower
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
 import           Data.Text.Encoding
+import qualified Data.UUID                     as UUID
+import           Domain.User
+import           Effects.Logger
 
 capitalize :: Text -> Text
 capitalize "" = ""
@@ -22,3 +25,6 @@ normalize = capitalize . T.filter (/= '"')
 
 normalizeBS :: C.ByteString -> Text
 normalizeBS bs = T.filter (/= '"') (decodeUtf8 bs)
+
+logWith :: Logger m => T.Text -> UserId -> m ()
+logWith t (UserId uid) = logInfo $ t <> UUID.toText uid

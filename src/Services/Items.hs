@@ -24,7 +24,7 @@ data Items m = Items
   , findById :: ItemId -> m (Maybe Item)
   , create :: CreateItem -> m ()
   , update :: UpdateItem -> m ()
-  }
+  } deriving Generic
 
 mkItems :: Connection -> Items IO
 mkItems c = Items { findAll  = (fmap . fmap) toDomain (findAll' c)

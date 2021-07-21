@@ -16,13 +16,13 @@ newtype Quantity = Quantity Int deriving (Generic, ToRow, Show)
 newtype CartExpiration = CartExpiration Integer deriving (Generic, ToRow, Show)
 
 data CartItem = CartItem
-  { cartItem :: Item
-  , cartQuantity :: Quantity
+  { item :: Item
+  , quantity :: Quantity
   } deriving (Generic, Show)
 
 data CartTotal = CartTotal
-  { cartItems :: [CartItem]
-  , cartTotal :: Money
+  { items :: [CartItem]
+  , total :: Money
   } deriving (Generic, Show)
 
 instance ToJSON Quantity where
@@ -43,9 +43,9 @@ instance FromJSON CartItem where
     return $ CartItem i q
 
 instance ToJSON CartItem where
-  toJSON (CartItem item quantity) =
-    object ["item" .= item, "quantity" .= quantity]
+  toJSON (CartItem _item _quantity) =
+    object ["item" .= _item, "quantity" .= _quantity]
 
 instance ToJSON CartTotal where
-  toJSON (CartTotal items total) =
-    object ["items" .= items, "total" .= total]
+  toJSON (CartTotal _items _total) =
+    object ["items" .= _items, "total" .= _total]

@@ -1,18 +1,18 @@
-{-# LANGUAGE DataKinds, OverloadedStrings, TypeOperators #-}
+{-# LANGUAGE DataKinds, OverloadedLabels, OverloadedStrings, TypeOperators #-}
 
 module Http.Routes.Cart where
 
+import           Control.Lens
 import           Control.Monad.IO.Class         ( liftIO )
 import           Data.Foldable                  ( traverse_ )
+import           Data.Generics.Labels           ( )
 import qualified Data.Map                      as M
-import qualified Data.UUID                     as UUID
 import           Domain.Cart
 import           Domain.User
-import           Effects.Logger
 import           Http.Routes.Version
 import           Servant
 import           Services.ShoppingCart          ( ShoppingCart )
-import qualified Services.ShoppingCart         as SC
+import           Utils.Text                     ( logWith )
 
 -- TODO: it should be authenticated via JWT
 type CartAPI =
@@ -24,16 +24,16 @@ cartServer :: ShoppingCart IO -> Server CartAPI
 cartServer s = findCartBy s :<|> addToCart s :<|> deleteCartBy s
 
 findCartBy :: ShoppingCart IO -> UserId -> Handler CartTotal
-findCartBy s u@(UserId uid) = do
-  logInfo $ "[Shopping Cart] - Find by UserId: " <> UUID.toText uid
-  liftIO $ SC.get s u
+findCartBy cart uid = do
+  logWith "[Shopping Cart] - Find by UserId: " uid
+  uid & cart ^. #get & liftIO
 
 addToCart :: ShoppingCart IO -> UserId -> Cart -> Handler ()
-addToCart s u@(UserId uid) (Cart cart) = do
-  logInfo $ "[Shopping Cart] - Add items for UserId: " <> UUID.toText uid
-  liftIO $ traverse_ (uncurry $ SC.add s u) (M.toList cart)
+addToCart cart uid (Cart ct) = do
+  logWith "[Shopping Cart] - Add items for UserId: " uid
+  traverse_ (uncurry $ (cart ^. #add) uid) (M.toList ct) & liftIO
 
 deleteCartBy :: ShoppingCart IO -> UserId -> Handler ()
-deleteCartBy s u@(UserId uid) = do
-  logInfo $ "[Shopping Cart] - Delete Cart by UserId: " <> UUID.toText uid
-  liftIO $ SC.delete s u
+deleteCartBy cart uid = do
+  logWith "[Shopping Cart] - Delete Cart by UserId: " uid
+  uid & cart ^. #delete & liftIO

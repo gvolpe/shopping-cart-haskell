@@ -1,11 +1,11 @@
-{-# LANGUAGE LambdaCase, RankNTypes #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Utils.Errors where
 
 import           Control.Monad.Catch
 import           Data.List.NonEmpty
 
-attempt :: forall m a . MonadMask m => m a -> m (Either SomeException a)
+attempt :: forall m a . MonadCatch m => m a -> m (Either SomeException a)
 attempt = try
 
 ensureNonEmpty

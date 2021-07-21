@@ -1,6 +1,6 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings, RecordWildCards #-}
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedLabels, TemplateHaskell #-}
 
 module Programs.Checkout
   ( Checkout(..)
@@ -8,15 +8,18 @@ module Programs.Checkout
   )
 where
 
+import           Control.Lens                   ( (^.)
+                                                , (&)
+                                                )
 import           Control.Monad.Catch
 import           Control.Retry                  ( RetryPolicyM
                                                 , RetryStatus(..)
                                                 , limitRetries
                                                 , exponentialBackoff
                                                 )
-import qualified Data.List.NonEmpty            as NEL
+import           Data.Generics.Labels           ( )
+import           Data.List.NonEmpty             ( NonEmpty )
 import qualified Data.Text                     as T
-import qualified Data.UUID                     as UUID
 import           Domain.Cart
 import           Domain.Checkout
 import           Domain.Item
@@ -26,20 +29,18 @@ import           Domain.User
 import           Effects.Background
 import           Effects.Logger
 import           Effects.Retry                  ( Retry(..) )
+import           GHC.Generics                   ( Generic )
 import           Http.Clients.Payments          ( PaymentClient )
-import qualified Http.Clients.Payments         as PC
-import           Refined
+import           Refined                 hiding ( NonEmpty )
 import           Services.Orders                ( Orders )
-import qualified Services.Orders               as SO
 import           Services.ShoppingCart          ( ShoppingCart )
-import qualified Services.ShoppingCart         as SC
 import           Utils.Errors                   ( attempt
                                                 , ensureNonEmpty
                                                 )
 
 data Checkout m = Checkout
   { process :: UserId -> Card -> m OrderId
-  }
+  } deriving Generic
 
 mkCheckout
   :: (Background m, Logger m, MonadMask m, Retry m)
@@ -52,41 +53,6 @@ mkCheckout p s o = Checkout (process' p s o)
 policy :: Monad m => RetryPolicyM m
 policy = limitRetries 3 <> exponentialBackoff 10000
 
-processPayment'
-  :: (Logger m, MonadMask m, Retry m)
-  => PaymentClient m
-  -> Payment
-  -> m PaymentId
-processPayment' client payment =
-  let action RetryStatus {..} = do
-        logInfo $ "[Checkout] - Processing payment #" <> T.pack
-          (show rsIterNumber)
-        PC.processPayment client payment
-  in  retry policy action
-
-createOrder'
-  :: forall m
-   . (Background m, Logger m, MonadMask m, Retry m)
-  => Orders m
-  -> UserId
-  -> PaymentId
-  -> NEL.NonEmpty CartItem
-  -> Money
-  -> m OrderId
-createOrder' orders uid pid items total =
-  let bgAction :: m OrderId -> m OrderId
-      bgAction fa = fa `onError` do
-        logError "[Checkout] - Failed to create order, rescheduling"
-        schedule (bgAction fa) (Mins $$(refineTH 60))
-        throwM OrderError
-      action RetryStatus {..} = do
-        logInfo $ "[Checkout] - Creating order #" <> T.pack (show rsIterNumber)
-        SO.create orders uid pid items total
-  in  bgAction $ retry policy action
-
-logWith :: Logger m => T.Text -> UserId -> m ()
-logWith t (UserId uid) = logInfo $ t <> UUID.toText uid
-
 process'
   :: forall m
    . (Background m, Logger m, MonadMask m, Retry m)
@@ -96,11 +62,31 @@ process'
   -> UserId
   -> Card
   -> m OrderId
-process' pc sc so uid card = do
-  logWith "[Checkout] - Retrieving shopping cart for " uid
-  CartTotal {..} <- SC.get sc uid
-  cartItems'     <- ensureNonEmpty EmptyCartError cartItems
-  paymentId      <- processPayment' pc $ Payment uid cartTotal card
-  orderId        <- createOrder' so uid paymentId cartItems' cartTotal
-  logWith "[Checkout] - Deleting shopping cart for " uid
-  orderId <$ attempt (SC.delete sc uid)
+process' payments cart orders uid card = do
+  CartTotal {..} <- uid & cart ^. #get
+  its            <- ensureNonEmpty EmptyCartError items
+  pid            <- processPayment' $ Payment uid total card
+  oid            <- createOrder' pid its total
+  oid <$ attempt (uid & cart ^. #delete)
+ where
+  -- Process payment with retries
+  processPayment' :: Payment -> m PaymentId
+  processPayment' payment =
+    let action RetryStatus {..} = do
+          logInfo $ "[Checkout] - Processing payment #" <> T.pack
+            (show rsIterNumber)
+          payment & payments ^. #process
+    in  retry policy action
+  -- Create orders with retries and background action
+  createOrder' :: PaymentId -> NonEmpty CartItem -> Money -> m OrderId
+  createOrder' pid items' total' =
+    let bgAction :: m OrderId -> m OrderId
+        bgAction fa = fa `onError` do
+          logError "[Checkout] - Failed to create order, rescheduling"
+          schedule (bgAction fa) (Mins $$(refineTH 60))
+          throwM OrderError
+        action RetryStatus {..} = do
+          logInfo $ "[Checkout] - Creating order #" <> T.pack
+            (show rsIterNumber)
+          (orders ^. #create) uid pid items' total'
+    in  bgAction $ retry policy action

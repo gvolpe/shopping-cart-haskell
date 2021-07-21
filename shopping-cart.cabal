@@ -55,6 +55,7 @@ library
                      , containers
                      , dhall
                      , exceptions
+                     , generic-lens
                      , hedis
                      , lens
                      , par-dual

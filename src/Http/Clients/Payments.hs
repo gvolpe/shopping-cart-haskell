@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
 
 module Http.Clients.Payments
   ( PaymentClient(..)
@@ -8,12 +8,13 @@ where
 
 import           Data.Aeson                     ( toJSON )
 import           Domain.Payment
+import           GHC.Generics                   ( Generic )
 import           Http.Client
 import           Network.Wreq                   ( defaults )
 
 data PaymentClient m = PaymentClient
-  { processPayment :: Payment -> m PaymentId
-  }
+  { process :: Payment -> m PaymentId
+  } deriving Generic
 
 mkPaymentClient :: HTTPClient m => PaymentClient m
 mkPaymentClient = PaymentClient process'

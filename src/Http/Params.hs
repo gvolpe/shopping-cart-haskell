@@ -1,5 +1,4 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DerivingStrategies, FlexibleInstances, GeneralizedNewtypeDeriving #-}
 
 module Http.Params where
 
@@ -14,4 +13,5 @@ toBrandName :: BrandNameParam -> BrandName
 toBrandName (BrandNameParam p) = BrandName . normalize $ unrefine p
 
 newtype BrandNameParam = BrandNameParam (Refined NonEmpty Text)
-  deriving (FromHttpApiData, Show)
+  deriving stock Show
+  deriving newtype FromHttpApiData

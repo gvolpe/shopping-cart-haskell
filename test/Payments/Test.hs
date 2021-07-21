@@ -23,7 +23,7 @@ payments :: Property
 payments = property $ do
   evalIO $ putStrLn "Making payment request"
   uuid <- evalIO UUID.nextRandom
-  pid  <- evalIO $ P.processPayment client (payment uuid)
+  pid  <- evalIO $ P.process client (payment uuid)
   (Just pid) === (PaymentId <$> fromText "6ff33dbc-6b8c-11ea-bc55-0242ac130003")
  where
   client = P.mkPaymentClient
