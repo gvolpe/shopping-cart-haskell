@@ -44,7 +44,6 @@ library
                      , Services.Orders
                      , Services.ShoppingCart
                      , Utils.Errors
-                     , Utils.Lift
                      , Utils.Redis
                      , Utils.Text
   build-depends:       base

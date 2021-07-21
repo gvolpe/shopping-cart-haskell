@@ -10,7 +10,7 @@ import qualified Data.UUID                     as UUID
 import qualified Database.Redis                as R
 import           Orphan                         ( )
 import           Text.Read                      ( readMaybe )
-import           Utils.Lift                     ( fromEitherM )
+import           Utils.Errors                   ( fromEitherM )
 import           Utils.Text                     ( normalizeBS )
 
 readInt
