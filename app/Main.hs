@@ -2,6 +2,7 @@
 
 module Main where
 
+import           Control.Monad.Managed          ( with )
 import           Domain.Cart                    ( CartExpiration(..) )
 import           Http.Clients.Payments          ( mkPaymentClient )
 import           Http.Server                    ( runServer )
@@ -14,7 +15,7 @@ import           Services.ShoppingCart          ( mkShoppingCart )
 import           Services
 
 main :: IO ()
-main = mkResources >>= \Res {..} ->
+main = with mkResources $ \Res {..} ->
   let brands   = mkBrands psql
       items    = mkItems psql
       cart     = mkShoppingCart redis items exp'

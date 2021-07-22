@@ -6,7 +6,8 @@ module Resources
   )
 where
 
-import           Control.Monad.IO.Class
+import           Control.Monad.Catch            ( bracket )
+import           Control.Monad.Managed
 import qualified Database.PostgreSQL.Simple    as P
 import qualified Database.Redis                as R
 import           Effects.Logger
@@ -16,20 +17,30 @@ data Resources = Res
   , redis :: R.Connection
   }
 
-mkResources :: (Logger m, MonadIO m) => m Resources
+mkResources :: Managed Resources
 mkResources = Res <$> psqlResource <*> redisResource
 
-redisResource :: (Logger m, MonadIO m) => m R.Connection
-redisResource = do
-  logInfo "Acquiring Redis connection"
-  liftIO $ R.checkedConnect R.defaultConnectInfo
+redisResource :: Managed R.Connection
+redisResource =
+  let acquire = do
+        logInfo "Acquiring Redis connection"
+        R.checkedConnect R.defaultConnectInfo
+      release c = do
+        logInfo "Closing Redis connection"
+        R.disconnect c
+  in managed $ bracket acquire release
 
-psqlResource :: (Logger m, MonadIO m) => m P.Connection
-psqlResource = do
-  logInfo "Acquiring PostgreSQL connection"
-  liftIO $ P.connect P.ConnectInfo { P.connectHost     = "localhost"
-                                   , P.connectPort     = 5432
-                                   , P.connectUser     = "postgres"
-                                   , P.connectPassword = "my-password"
-                                   , P.connectDatabase = "store"
-                                   }
+psqlResource :: Managed P.Connection
+psqlResource =
+  let acquire = do
+        logInfo "Acquiring PostgreSQL connection"
+        P.connect P.ConnectInfo { P.connectHost     = "localhost"
+                                , P.connectPort     = 5432
+                                , P.connectUser     = "postgres"
+                                , P.connectPassword = "my-password"
+                                , P.connectDatabase = "store"
+                                }
+      release c = do
+        logInfo "Closing PostgreSQL connection"
+        P.close c
+  in  managed $ bracket acquire release
