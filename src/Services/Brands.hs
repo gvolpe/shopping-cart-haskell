@@ -11,6 +11,7 @@ import           Data.Functor                   ( void )
 import           Data.UUID                      ( UUID )
 import           Data.UUID.V4                   ( nextRandom )
 import           Data.Text                      ( Text )
+import           Database.PostgreSQL.Resilient  ( ResilientConnection(..) )
 import           Database.PostgreSQL.Simple
 import           Domain.Brand
 import           GHC.Generics                   ( Generic )
@@ -20,10 +21,9 @@ data Brands m = Brands
   , create :: BrandName -> m ()
   } deriving Generic
 
-mkBrands :: Connection -> Brands IO
-mkBrands c = Brands { findAll = (fmap . fmap) toDomain (findAll' c)
-                    , create  = create' c
-                    }
+mkBrands :: ResilientConnection IO -> Brands IO
+mkBrands p =
+  Brands { findAll = (fmap . fmap) toDomain (findAll' p), create = create' p }
 
 data BrandDTO = BrandDTO
   { _brandId :: UUID
@@ -33,12 +33,15 @@ data BrandDTO = BrandDTO
 toDomain :: BrandDTO -> Brand
 toDomain BrandDTO {..} = Brand (BrandId _brandId) (BrandName _brandName)
 
-findAll' :: Connection -> IO [BrandDTO]
-findAll' = flip query_ "SELECT * FROM brands"
+findAll' :: ResilientConnection IO -> IO [BrandDTO]
+findAll' pool = do
+  conn <- getConnection pool
+  query_ conn "SELECT * FROM brands"
 
-create' :: Connection -> BrandName -> IO ()
-create' c (BrandName bname) = do
+create' :: ResilientConnection IO -> BrandName -> IO ()
+create' pool (BrandName bname) = do
   uuid <- nextRandom
-  void $ executeMany c
+  conn <- getConnection pool
+  void $ executeMany conn
                      "INSERT INTO brands (uuid, name) VALUES (?, ?)"
                      [(uuid, bname)]

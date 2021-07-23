@@ -14,6 +14,7 @@ import qualified Data.Map                      as M
 import           Data.Maybe                     ( listToMaybe )
 import           Data.UUID                      ( UUID )
 import qualified Data.UUID.V4                  as UUID
+import           Database.PostgreSQL.Resilient  ( ResilientConnection(..) )
 import           Database.PostgreSQL.Simple
 import           Domain.Cart
 import           Domain.Item
@@ -29,11 +30,11 @@ data Orders m = Orders
   , create :: UserId -> PaymentId -> NonEmpty CartItem -> Money -> m OrderId
   } deriving Generic
 
-mkOrders :: Connection -> Orders IO
-mkOrders conn = Orders
-  { get    = \uid oid -> (fmap . fmap) toDomain (get' conn uid oid)
-  , findBy = (fmap . fmap) toDomain . findBy' conn
-  , create = create' conn
+mkOrders :: ResilientConnection IO -> Orders IO
+mkOrders p = Orders
+  { get    = \uid oid -> (fmap . fmap) toDomain (get' p uid oid)
+  , findBy = (fmap . fmap) toDomain . findBy' p
+  , create = create' p
   }
 
 data OrderDTO = OrderDTO
@@ -58,22 +59,26 @@ selectByUserAndOrderQuery :: Query
 selectByUserAndOrderQuery =
   "SELECT * FROM orders WHERE user_id = ? AND uuid = ?"
 
-get' :: Connection -> UserId -> OrderId -> IO (Maybe OrderDTO)
-get' conn (UserId uid) (OrderId oid) =
+get' :: ResilientConnection IO -> UserId -> OrderId -> IO (Maybe OrderDTO)
+get' pool (UserId uid) (OrderId oid) = do
+  conn <- getConnection pool
   listToMaybe <$> query conn selectByUserAndOrderQuery [uid, oid]
 
-findBy' :: Connection -> UserId -> IO [OrderDTO]
-findBy' = flip query "SELECT * FROM orders WHERE user_id = ?"
+findBy' :: ResilientConnection IO -> UserId -> IO [OrderDTO]
+findBy' pool uid = do
+  conn <- getConnection pool
+  query conn "SELECT * FROM orders WHERE user_id = ?" uid
 
 create'
-  :: Connection
+  :: ResilientConnection IO
   -> UserId
   -> PaymentId
   -> NonEmpty CartItem
   -> Money
   -> IO OrderId
-create' conn (UserId uid) (PaymentId pid) its (Money money) = do
+create' pool (UserId uid) (PaymentId pid) its (Money money) = do
   oid <- OrderId <$> UUID.nextRandom
+  conn <- getConnection pool
   oid <$ executeMany conn
                      "INSERT INTO orders VALUES (?, ?, ?, ?, ?)"
                      (values oid)

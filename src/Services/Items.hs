@@ -11,6 +11,7 @@ where
 import           Data.Maybe                     ( listToMaybe )
 import           Data.Text                      ( Text )
 import           Data.UUID                      ( UUID )
+import           Database.PostgreSQL.Resilient  ( ResilientConnection(..) )
 import           Database.PostgreSQL.Simple
 import           Domain.Brand
 import           Domain.Category
@@ -26,12 +27,12 @@ data Items m = Items
   , update :: UpdateItem -> m ()
   } deriving Generic
 
-mkItems :: Connection -> Items IO
-mkItems c = Items { findAll  = (fmap . fmap) toDomain (findAll' c)
-                  , findBy   = (fmap . fmap) toDomain . findBy' c
-                  , findById = (fmap . fmap) toDomain . findById' c
-                  , create   = create' c
-                  , update   = update' c
+mkItems :: ResilientConnection IO -> Items IO
+mkItems p = Items { findAll  = (fmap . fmap) toDomain (findAll' p)
+                  , findBy   = (fmap . fmap) toDomain . findBy' p
+                  , findById = (fmap . fmap) toDomain . findById' p
+                  , create   = create' p
+                  , update   = update' p
                   }
 
 data ItemDTO = ItemDTO
@@ -63,8 +64,10 @@ selectAllQuery =
      INNER JOIN brands AS b ON i.brand_id = b.uuid
      INNER JOIN categories AS c ON i.category_id = c.uuid|]
 
-findAll' :: Connection -> IO [ItemDTO]
-findAll' = flip query_ selectAllQuery
+findAll' :: ResilientConnection IO -> IO [ItemDTO]
+findAll' pool = do
+  conn <- getConnection pool
+  query_ conn selectAllQuery
 
 selectByBrandQuery :: Query
 selectByBrandQuery =
@@ -74,8 +77,10 @@ selectByBrandQuery =
      INNER JOIN categories AS c ON i.category_id = c.uuid
      WHERE b.name LIKE ?|]
 
-findBy' :: Connection -> BrandName -> IO [ItemDTO]
-findBy' = flip query selectByBrandQuery
+findBy' :: ResilientConnection IO -> BrandName -> IO [ItemDTO]
+findBy' pool brand = do
+  conn <- getConnection pool
+  query conn selectByBrandQuery brand
 
 selectByItemIdQuery :: Query
 selectByItemIdQuery =
@@ -85,11 +90,13 @@ selectByItemIdQuery =
      INNER JOIN categories AS c ON i.category_id = c.uuid
      WHERE i.uuid = ?|]
 
-findById' :: Connection -> ItemId -> IO (Maybe ItemDTO)
-findById' c i = listToMaybe <$> query c selectByItemIdQuery i
+findById' :: ResilientConnection IO -> ItemId -> IO (Maybe ItemDTO)
+findById' pool i = do
+  conn <- getConnection pool
+  listToMaybe <$> query conn selectByItemIdQuery i
 
-create' :: Connection -> CreateItem -> IO ()
+create' :: ResilientConnection IO -> CreateItem -> IO ()
 create' _ _ = pure ()
 
-update' :: Connection -> UpdateItem -> IO ()
+update' :: ResilientConnection IO -> UpdateItem -> IO ()
 update' _ _ = pure ()

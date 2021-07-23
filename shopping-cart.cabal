@@ -59,6 +59,7 @@ library
                      , lens
                      , managed
                      , par-dual
+                     , postgresql-resilient
                      , postgresql-simple
                      , prettyprinter
                      , raw-strings-qq

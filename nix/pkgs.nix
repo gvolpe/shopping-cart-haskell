@@ -11,13 +11,22 @@ let
 
   hp = pkgs.haskell.packages.${compiler}.override {
     overrides = newPkgs: oldPkgs: rec {
-      # Override to use the `par-dual-1.0.0.0` package
       par-dual =
         pkgs.haskell.lib.dontCheck (
           newPkgs.callCabal2nix "par-dual" (
             builtins.fetchGit {
               url = "https://github.com/gvolpe/par-dual.git";
               rev = "49ad0c2102e061d38133540a2d6dcf75d4dac69c";
+            }
+          ) {}
+        );
+
+      postgresql-resilient =
+        pkgs.haskell.lib.dontCheck (
+          newPkgs.callCabal2nix "postgresql-resilient" (
+            builtins.fetchGit {
+              url = "https://github.com/gvolpe/postgresql-resilient.git";
+              rev = "14b06bb69a43e00889fc37068e97fa3826c3f25e";
             }
           ) {}
         );
