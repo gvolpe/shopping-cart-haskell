@@ -8,6 +8,7 @@ where
 
 import           Control.Monad.Catch
 import           Control.Monad.Managed
+import qualified Data.Text                     as T
 import           Database.PostgreSQL.Resilient
 import qualified Database.PostgreSQL.Simple    as P
 import qualified Database.Redis                as R
@@ -34,9 +35,14 @@ redisResource =
 psqlResource :: Managed (ResilientConnection IO)
 psqlResource = managed $ withResilientConnection
   defaultSettings
+  logHandler
   P.ConnectInfo { P.connectHost     = "localhost"
                 , P.connectPort     = 5432
                 , P.connectUser     = "postgres"
                 , P.connectPassword = "my-password"
                 , P.connectDatabase = "store"
                 }
+ where
+  logHandler :: String -> IO ()
+  logHandler = logInfo . T.pack
+

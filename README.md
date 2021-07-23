@@ -31,7 +31,7 @@ The [original version](https://github.com/gvolpe/pfps-shopping-cart) of the Shop
 - [Servant](https://hackage.haskell.org/package/servant) is used as the default HTTP server.
 - [Wreq](https://hackage.haskell.org/package/wreq) is used as the default HTTP client.
 - [Hedis](https://hackage.haskell.org/package/hedis) is used as the default Redis client.
-- [PostgreSQL Simple](https://hackage.haskell.org/package/postgresql-simple) + [Raw Strings QQ](https://hackage.haskell.org/package/raw-strings-qq) are used to handle PostgreSQL stuff.
+- [PostgreSQL Simple](https://hackage.haskell.org/package/postgresql-simple), [PostgreSQL Resilient](https://hackage.haskell.org/package/postgresql-resilient), and [Raw Strings QQ](https://hackage.haskell.org/package/raw-strings-qq) are used to handle PostgreSQL stuff.
 
 A polymorphic record of functions looks as follows:
 
