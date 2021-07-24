@@ -34,7 +34,7 @@ redisResource =
 
 psqlResource :: Managed (ResilientConnection IO)
 psqlResource = managed $ withResilientConnection
-  defaultSettings
+  defaultResilientSettings
   logHandler
   P.ConnectInfo { P.connectHost     = "localhost"
                 , P.connectPort     = 5432
@@ -45,4 +45,3 @@ psqlResource = managed $ withResilientConnection
  where
   logHandler :: String -> IO ()
   logHandler = logInfo . T.pack
-
