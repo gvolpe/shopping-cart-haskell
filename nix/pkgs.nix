@@ -26,7 +26,7 @@ let
           newPkgs.callCabal2nix "postgresql-resilient" (
             builtins.fetchGit {
               url = "https://github.com/gvolpe/postgresql-resilient.git";
-              rev = "c7fb926b3ac352535e0392bbe66a93ba4e967d7d";
+              rev = "63f62e29a3aa97cbd6f49845fa635209c8e7c4a1";
             }
           ) {}
         );
